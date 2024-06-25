@@ -116,9 +116,9 @@ class PIMKernel
     vector<int> pim_ranks_;
     PIMMode mode_;
     shared_ptr<MultiChannelMemorySystem> mem_;
-    const uint32_t pim_reg_ra = 0x3fff;
-    const uint32_t pim_abmr_ra = 0x27ff;
-    const uint32_t pim_sbmr_ra = 0x2fff;
+    const uint32_t pim_reg_ra_ = 0x3fff;
+    const uint32_t pim_abmr_ra_ = 0x27ff;
+    const uint32_t pim_sbmr_ra_ = 0x2fff;
 
     int inline getToggleCond(pimBankType pb_type = pimBankType::ALL_BANK)
     {
