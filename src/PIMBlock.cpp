@@ -109,13 +109,11 @@ void PIMBlock::mad(BurstType& dstBst, BurstType& src0Bst, BurstType& src1Bst, Bu
 std::string PIMBlock::print()
 {
     stringstream ss;
-    ss << "[SRF]" << srf.binToStr();
-    ss << "[GRF_A]";
-    for (int i = 0; i < 8; i++) ss << grfA[i].binToStr();
-    ss << "[GRF_B]";
-    for (int i = 0; i < 8; i++) ss << grfB[i].binToStr();
-    ss << "[M_OUT]" << mOut.binToStr();
-    ss << "[A_OUT]" << aOut.binToStr();
+    ss << "[SRF]" << srf.binToStr() << endl;
+    for (int i = 0; i < 8; i++) ss << "[GRF_A][" << i << "]" << grfA[i].fp16ToStr() << endl;
+    for (int i = 0; i < 8; i++) ss << "[GRF_B][" << i << "]" << grfB[i].fp16ToStr() << endl;
+    ss << "[M_OUT]" << mOut.binToStr() << endl;
+    ss << "[A_OUT]" << aOut.binToStr() << endl;
 
     return ss.str();
 }

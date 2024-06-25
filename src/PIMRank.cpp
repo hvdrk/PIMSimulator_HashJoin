@@ -394,17 +394,12 @@ void PIMRank::doPIM(BusPacket* packet)
 
             for (int pimblock_id = 0; pimblock_id < config.NUM_PIM_BLOCKS; pimblock_id++)
             {
-                if (DEBUG_PIM_BLOCK && pimblock_id == 0)
-                {
-                    PRINT(pimBlocks[pimblock_id].print());
-                    PRINT("[BANK_R]" << packet->data->binToStr());
-                    PRINT("[CMD]" << bitset<32>(cCmd.toInt()) << "(" << cCmd.toStr() << ")");
-                }
-
                 doPIMBlock(packet, cCmd, pimblock_id);
 
                 if (DEBUG_PIM_BLOCK && pimblock_id == 0)
                 {
+                    PRINT("[BANK_R]" << packet->data->fp16ToStr());
+                    PRINT("[CMD]" << bitset<32>(cCmd.toInt()) << "(" << cCmd.toStr() << ")");
                     PRINT(pimBlocks[pimblock_id].print());
                     PRINT("----------");
                 }

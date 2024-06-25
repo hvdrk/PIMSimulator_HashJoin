@@ -28,31 +28,31 @@ using namespace DRAMSim;
 
 namespace DRAMSim
 {
-#define OUTLOG_ALL(msg)                                                                 \
-    msg << " ch" << getChanId() << " ra" << getRankId() << " bg"                        \
-        << config.addrMapping.bankgroupId(packet->bank) << " b" << packet->bank << " r" \
-        << packet->row << " c" << packet->column << " @" << currentClockCycle
+#define OUTLOG_ALL(msg)                                                                       \
+    msg << " ch[" << getChanId() << "] ra[" << getRankId() << "] bg["                         \
+        << config.addrMapping.bankgroupId(packet->bank) << "] ba[" << packet->bank << "] ro[" \
+        << packet->row << "] co[" << packet->column << "] @" << currentClockCycle
 #define OUTLOG_CH_RA(msg) \
-    msg << " ch" << getChanId() << " ra" << getRankId() << " @" << currentClockCycle
-#define OUTLOG_PRECHARGE(msg)                                                           \
-    msg << " ch" << getChanId() << " ra" << getRankId() << " bg"                        \
-        << config.addrMapping.bankgroupId(packet->bank) << " b" << packet->bank << " r" \
-        << bankStates[packet->bank].openRowAddress << " @" << currentClockCycle
-#define OUTLOG_GRF_A(msg)                                                                      \
-    msg << " ch" << getChanId() << " ra" << getRankId() << " pb" << packet->bank / 2 << " reg" \
-        << packet->column - 0x8 << " @" << currentClockCycle
-#define OUTLOG_GRF_B(msg)                                                                      \
-    msg << " ch" << getChanId() << " ra" << getRankId() << " pb" << packet->bank / 2 << " reg" \
-        << packet->column - 0x18 << " @" << currentClockCycle
-#define OUTLOG_B_GRF_A(msg)                                                                       \
-    msg << " ch" << getChanId() << " ra" << getRankId() << " reg" << packet->column - 0x8 << " @" \
-        << currentClockCycle
-#define OUTLOG_B_GRF_B(msg)                                                                        \
-    msg << " ch" << getChanId() << " ra" << getRankId() << " reg" << packet->column - 0x18 << " @" \
-        << currentClockCycle
-#define OUTLOG_B_CRF(msg)                                                                         \
-    msg << " ch" << getChanId() << " ra" << getRankId() << " idx" << packet->column - 0x4 << " @" \
-        << currentClockCycle
+    msg << " ch[" << getChanId() << "] ra[" << getRankId() << "] @" << currentClockCycle
+#define OUTLOG_PRECHARGE(msg)                                                                 \
+    msg << " ch[" << getChanId() << "] ra[" << getRankId() << "] bg["                         \
+        << config.addrMapping.bankgroupId(packet->bank) << "] ba[" << packet->bank << "] ro[" \
+        << bankStates[packet->bank].openRowAddress << "] @" << currentClockCycle
+#define OUTLOG_GRF_A(msg)                                                                 \
+    msg << " ch[" << getChanId() << "] ra[" << getRankId() << "] pb[" << packet->bank / 2 \
+        << " reg" << packet->column - 0x8 << " @" << currentClockCycle
+#define OUTLOG_GRF_B(msg)                                                                 \
+    msg << " ch[" << getChanId() << "] ra[" << getRankId() << "] pb[" << packet->bank / 2 \
+        << "] reg[" << packet->column - 0x18 << "] @" << currentClockCycle
+#define OUTLOG_B_GRF_A(msg)                                                                    \
+    msg << " ch[" << getChanId() << "] ra[" << getRankId() << "] reg[" << packet->column - 0x8 \
+        << "] @" << currentClockCycle
+#define OUTLOG_B_GRF_B(msg)                                                                     \
+    msg << " ch[" << getChanId() << "] ra[" << getRankId() << "] reg[" << packet->column - 0x18 \
+        << "] @" << currentClockCycle
+#define OUTLOG_B_CRF(msg)                                                                      \
+    msg << " ch[" << getChanId() << "] ra[" << getRankId() << "] idx[" << packet->column - 0x4 \
+        << "] @" << currentClockCycle
 
 class Rank;  // forward declaration
 
