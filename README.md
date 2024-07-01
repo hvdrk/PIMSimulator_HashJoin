@@ -85,12 +85,8 @@ ADDRESS_MAPPING_SCHEME=Scheme8
 |        |  |        |
 |--------|  |--------|
 ```
-
-* if 2 * NUM_PIM_BLOCKS == NUM_BANK, a PIM block is located per two banks.
-  * NUM_PIM_BLOCKS = 8, NUM_BANKS = 16
-
-* if NUM_PIM_BLOCKS == NUM_BANKS, a PIM Block (PB) is located per banks.
-  * NUM_PIM_BLOCKS = 8, NUM_BANKS = 8
+* A PIM Block (PB) is located per banks.
+  * NUM_BANKS = 16, NUM_PIM_BLOCKS = 8
 
 
 ### 2.3 PIM Instruction-Set Architecture
@@ -110,7 +106,7 @@ ADDRESS_MAPPING_SCHEME=Scheme8
 * Three instructions types
   * 4 Arithmetic: ADD, MUL, MAC, MAD
   * 2 Data transfer: MOV, FILL
-  * 3 control flows: NOP, JUMP, EXIT
+  * 3 Control flows: NOP, JUMP, EXIT
 * JUMP instruction
   * Zero-cycle static branch: supports only a pre-programmed numbers of iterations
 * Operand type:
@@ -132,7 +128,7 @@ ADDRESS_MAPPING_SCHEME=Scheme8
 
 * SB mode: standard DRAM operation
 * HAB mode: Allowing concurrent accesses to multiple banks with a single DRAM command
-* PIM mode: Triggers the execution of PIM commands on the CRF by DRAM Command
+* PIM mode: Triggers the execution of PIM instructions on the CRF by DRAM Command
 
 
 ## 3. Setup
