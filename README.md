@@ -1,3 +1,15 @@
+# PIMSimulator - HashJoin
+
+add hash join in PIMSimulator
+
+Triton Join : https://github.com/TU-Berlin-DIMA/fast-interconnects
+Modified Triton Join : https://github.com/hvdrk/Triton
+
+key and value is 64bits unsigned int.
+
+
+Following is original README.md
+
 # PIMSimulator
 
 ## Contents
