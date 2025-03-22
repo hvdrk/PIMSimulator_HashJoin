@@ -36,6 +36,8 @@
 #include <unordered_map>
 #include <vector>
 
+#include <iterator> //////////////////////
+
 namespace npy {
 
 /* Compile-time test for byte order.

@@ -50,8 +50,8 @@ def build(target_name, base_path, build_flags):
     build_sources = getSources("build")
     env.Program(target=target_name["binary"],
                 source=build_sources,
-                CPPPATH=[base_path["lib"], base_path["source"], base_path["tools"]],
-                LIBPATH=['.'], LIBS=['gtest', 'pthread'])
+                CPPPATH=[base_path["lib"], base_path["source"], base_path["tools"], "/home/hvdrk/miniconda3/include"],
+                LIBPATH=['.', "/home/hvdrk/miniconda3/lib"], LIBS=['gtest', 'pthread'])
 
     no_lib = ARGUMENTS.get('NO_LIBRARY', 0)
     if int(no_lib) == 0:
@@ -59,14 +59,14 @@ def build(target_name, base_path, build_flags):
         # print ("Creating a static library from objects")
         env.StaticLibrary(target=target_name["library"],
                           source=lib_sources,
-                          CPPPATH=[base_path["lib"], base_path["source"], base_path["tools"]],
-                          LIBPATH=['.'],
+                          CPPPATH=[base_path["lib"], base_path["source"], base_path["tools"], "/home/hvdrk/miniconda3/include"],
+                          LIBPATH=['.', "/home/hvdrk/miniconda3/lib"],
                           LIBS=['gtest', 'pthread'])
         # print ("Creating a shared library from objects")
         env.SharedLibrary(target=target_name["library"],
                           source=lib_sources,
-                          CPPPATH=[base_path["lib"], base_path["source"], base_path["tools"]],
-                          LIBPATH=['.'],
+                          CPPPATH=[base_path["lib"], base_path["source"], base_path["tools"], "/home/hvdrk/miniconda3/include"],
+                          LIBPATH=['.', "/home/hvdrk/miniconda3/lib"],
                           LIBS=['gtest', 'pthread'])
 
 

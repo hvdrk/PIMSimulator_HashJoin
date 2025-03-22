@@ -117,6 +117,7 @@ class PIMCmd
     {
     }
 
+    //3
     PIMCmd(PIMCmdType type, PIMOpdType dst, PIMOpdType src0, int is_auto = 0, int dst_idx = 0,
            int src0_idx = 0, int src1_idx = 0, int is_relu = 0)
         : type_(type),

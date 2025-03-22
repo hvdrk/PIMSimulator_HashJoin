@@ -15,5 +15,6 @@ np.save("resadd_input1_" + str(DIM_IN), data_in2)
 np.save("resadd_output_" + str(DIM_IN), data_out)
 
 print(data_in1)
+print(len(data_in1))
 print(data_in2)
 print(data_out)

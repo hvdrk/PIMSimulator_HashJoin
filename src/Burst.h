@@ -58,6 +58,11 @@ union BurstType
         set(x0, x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15);
     }
 
+    BurstType(uint64_t x0, uint64_t x1, uint64_t x2, uint64_t x3)
+    {
+        set(x0, x1, x2, x3);
+    }
+
     BurstType(uint32_t x0, uint32_t x1, uint32_t x2, uint32_t x3, uint32_t x4, uint32_t x5,
               uint32_t x6, uint32_t x7)
     {
@@ -109,6 +114,14 @@ union BurstType
         u32Data_[5] = x5;
         u32Data_[6] = x6;
         u32Data_[7] = x7;
+    }
+
+    void set(uint64_t x0, uint64_t x1, uint64_t x2, uint64_t x3)
+    {
+        u64Data_[0] = x0;
+        u64Data_[1] = x1;
+        u64Data_[2] = x2;
+        u64Data_[3] = x3;
     }
 
     void set(fp16 x0, fp16 x1, fp16 x2, fp16 x3, fp16 x4, fp16 x5, fp16 x6, fp16 x7, fp16 x8,
@@ -343,6 +356,7 @@ union BurstType
     fp16 fp16Data_[16];
     uint8_t u8Data_[32];
     float fp32Data_[8];
+    uint64_t u64Data_[4];
     uint32_t u32Data_[8];
     uint16_t u16Data_[16];
 };
@@ -350,6 +364,7 @@ union BurstType
 struct NumpyBurstType
 {
     vector<unsigned long> shape;
+    vector<unsigned long long> u64Data;
     vector<float> data;
     vector<uint16_t> u16Data;
     vector<unsigned long> bShape;
@@ -377,6 +392,17 @@ struct NumpyBurstType
                 bShape.push_back(ceil(shape[i] / divisor));
             else
                 bShape.push_back(shape[i]);
+        }
+    }
+
+    void loadInt64(string filename)
+    {
+        npy::LoadArrayFromNumpy(filename, shape, u64Data);
+        loadTobShape((double)4);
+        for (int i = 0; i < u64Data.size(); i += 4)
+        {
+            BurstType burst(u64Data[i], u64Data[i + 1], u64Data[i + 2], u64Data[i + 3]);
+            bData.push_back(burst);
         }
     }
 
