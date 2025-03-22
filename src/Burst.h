@@ -361,6 +361,7 @@ union BurstType
     uint16_t u16Data_[16];
 };
 
+
 struct NumpyBurstType
 {
     vector<unsigned long> shape;
