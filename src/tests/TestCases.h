@@ -218,6 +218,10 @@ class DataDim
 
                 return;
             }
+            // case KernelType::JOIN:
+            // {
+            //     input_npbst_.load
+            // }
             default:
             {
                 ERROR("== Error - Unknown KernelType trying to load data");
