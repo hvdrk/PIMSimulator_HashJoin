@@ -83,6 +83,7 @@ class PIMAddrManager
     AddressMappingScheme address_mapping_scheme_;
 };
 
+////////////////////////////////////////////////////////////////////////////////////
 // new kernel type JOIN
 enum class KernelType
 {

@@ -54,6 +54,9 @@ TEST_F(PIMBenchFixture, relu)
     expectPIMBench(2.0);
 }
 
+////////////////////////////////////////////////////////////////////////////////////
+// not yet
+// kernel test must be cleared before bench test
 TEST_F(PIMBenchFixture, join)
 {
     // setPIMBenchTestCase(KernelType::JOIN, 4 * 1024 * 1024, 4 * 1024 * 1024);
