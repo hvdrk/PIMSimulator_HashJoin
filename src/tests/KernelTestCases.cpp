@@ -142,3 +142,26 @@ TEST_F(PIMKernelFixture, relu)
     delete[] result_;
     delete dim_data;
 }
+
+// for join
+TEST_F(PIMKernelFixture, join)
+{
+    shared_ptr<PIMKernel> kernel = make_pim_kernel();
+    
+    //need to change
+    uint32_t output_dim = 4;
+    uint32_t input_dim = 16;
+    uint32_t input1_dim = 16;
+
+    DataDim *dim_data = new DataDim(KernelType::JOIN, 1, output_dim, input_dim, input1_dim, true);
+    dim_data->printDim(KernelType::JOIN);
+
+    result_ = getResultPIM(KernelType::JOIN, dim_data, kernel, result_);    // not changed getResultPim() yet
+    kernel->runPIM();
+
+    testStatsClear();
+    expectAccuracy(KernelType::RELU, dim_data->dimTobShape(output_dim), dim_data->output_npbst_);
+
+    delete[] result_;
+    delete dim_data;
+}

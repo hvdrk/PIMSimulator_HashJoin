@@ -53,3 +53,11 @@ TEST_F(PIMBenchFixture, relu)
     executePIMKernel();
     expectPIMBench(2.0);
 }
+
+TEST_F(PIMBenchFixture, join)
+{
+    // setPIMBenchTestCase(KernelType::JOIN, 4 * 1024 * 1024, 4 * 1024 * 1024);
+    // executeKernel();
+    // executePIMKernel();
+    // expectPIMBench(2.0);
+}

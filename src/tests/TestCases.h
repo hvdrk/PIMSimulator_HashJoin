@@ -218,10 +218,17 @@ class DataDim
 
                 return;
             }
-            // case KernelType::JOIN:
-            // {
-            //     input_npbst_.load
-            // }
+            ////////////////////////////////////////////////////////////////////////
+            case KernelType::JOIN:
+            {
+                input_npbst_.loadTuple("data/join/inner.npy");
+                input1_npbst_.loadTuple("data/join/outer.npy");
+                output_npbst_.loadInt64("data/join/sum.npy");
+
+                output_dim_ = bShape1ToDim(output_npbst_.getTotalDim());
+                input_dim_ = bShape1ToDim(input_npbst_.getTotalDim());
+                input1_dim_ = bShape1ToDim(input1_npbst_.getTotalDim());
+            }
             default:
             {
                 ERROR("== Error - Unknown KernelType trying to load data");
@@ -329,6 +336,24 @@ class DataDim
             loadDummyData(kn_type);
     }
 
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+    // DataDim for JOIN. add input1_dim for parameter
+    DataDim(KernelType kn_type, uint32_t batch_size, uint32_t output_dim, uint32_t input_dim,
+            uint32_t input1_dim, bool used_data)
+    {
+        batch_size_ = batch_size;
+        output_dim_ = output_dim;
+        input_dim_ = input_dim;
+        input1_dim_ = input1_dim;
+        used_data_ = used_data;
+
+        // load data from files
+        if (used_data_)
+            loadData(kn_type);
+        else
+            loadDummyData(kn_type);
+    }
+
     uint32_t getDataSize(uint32_t dim1, uint32_t dim2 = 1, uint32_t dim3 = 1)
     {
         return dim1 * dim2 * dim3 * getPrecisionToByte();
@@ -361,6 +386,13 @@ class DataDim
             {
                 cout << "  Input/output data dimension : " << output_dim_ << endl;
                 break;
+            }
+            case KernelType::JOIN:  ////////////////////////////////////////////////////////////
+            {
+                cout << "  Input data (inner) dimension : " << input_dim_ << endl;
+                cout << "  Input1 data (outer) dimension : " << input1_dim_ << endl;
+                cout << "  Output data dimension : " << output_dim_ << endl;
+
             }
             default:
             {

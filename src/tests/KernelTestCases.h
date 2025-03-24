@@ -156,6 +156,10 @@ class PIMKernelFixture : public testing::Test
                                  0);
                 break;
             }
+            // case KernelType::JOIN:
+            // {
+
+            // }
             case KernelType::GEMVTREE:
             default:
             {

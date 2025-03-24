@@ -270,6 +270,11 @@ class PIMBenchFixture : public testing::Test
         {
             perfTest = new ActPIMBenchTest(k, batch, out, in);
         }
+        // need to change
+        else if (k = KernelType::JOIN)
+        {
+            // perfTest = ;
+        }
         else
         {
             throw invalid_argument("Invalid kernel type");

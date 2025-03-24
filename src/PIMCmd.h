@@ -22,28 +22,28 @@ using namespace std;
 
 namespace DRAMSim
 {
-enum class PIMCmdType
+enum class PIMCmdType   // total 16 -> 4 bits
 {
     NOP,
     ADD,
     MUL,
     MAC,
     MAD,
-    REV0,
-    REV1,
-    REV2,
+    REV0,   // dummy
+    REV1,   // dummy
+    REV2,   // dummy
     MOV,
     FILL,
-    REV3,
-    REV4,
-    REV5,
-    REV6,
+    REV3,   // dummy
+    REV4,   // dummy
+    REV5,   // dummy
+    REV6,   // dummy
     JUMP,
     EXIT
 };
 
-enum class PIMOpdType
-{
+enum class PIMOpdType   // total 8 -> 3bits
+{                       // dst, src
     A_OUT,
     M_OUT,
     EVEN_BANK,

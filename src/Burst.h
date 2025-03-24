@@ -26,6 +26,12 @@
 
 using namespace std;
 
+// struct TUPLE
+struct Tuple {
+    uint64_t key;
+    uint64_t value;
+};
+
 namespace DRAMSim
 {
 union BurstType
@@ -76,6 +82,42 @@ union BurstType
         set(x0, x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15);
     }
 
+    /////////////////
+    // new BurstType
+    // Tuple, uint64
+    BurstType(Tuple x0, Tuple x1)
+    {
+        set(x0, x1);
+    }
+
+    BurstType(uint64_t x)
+    {
+        set(x);
+    }
+
+    void set(Tuple x0, Tuple x1)
+    {
+        u64Tuple_[0] = x0;
+        u64Tuple_[1] = x1;
+    }
+
+    void set(uint64_t x)
+    {
+        set(x, x, x, x);
+    }
+
+    void set(uint64_t x0, uint64_t x1, uint64_t x2, uint64_t x3)
+    {
+        u64Data_[0] = x0;
+        u64Data_[1] = x1;
+        u64Data_[2] = x2;
+        u64Data_[3] = x3;
+    }
+    /////////////////
+
+
+
+
     void set(float x)
     {
         set(x, x, x, x, x, x, x, x);
@@ -116,13 +158,7 @@ union BurstType
         u32Data_[7] = x7;
     }
 
-    void set(uint64_t x0, uint64_t x1, uint64_t x2, uint64_t x3)
-    {
-        u64Data_[0] = x0;
-        u64Data_[1] = x1;
-        u64Data_[2] = x2;
-        u64Data_[3] = x3;
-    }
+    
 
     void set(fp16 x0, fp16 x1, fp16 x2, fp16 x3, fp16 x4, fp16 x5, fp16 x6, fp16 x7, fp16 x8,
              fp16 x9, fp16 x10, fp16 x11, fp16 x12, fp16 x13, fp16 x14, fp16 x15)
@@ -356,10 +392,14 @@ union BurstType
     fp16 fp16Data_[16];
     uint8_t u8Data_[32];
     float fp32Data_[8];
-    uint64_t u64Data_[4];
+    uint64_t u64Data_[4];   //uint64
     uint32_t u32Data_[8];
     uint16_t u16Data_[16];
+    Tuple u64Tuple_[2]; //TUPLE
 };
+
+
+
 
 
 struct NumpyBurstType
@@ -396,6 +436,29 @@ struct NumpyBurstType
         }
     }
 
+    // Load Tuple
+    void loadTuple(string filename)
+    {
+        npy::LoadArrayFromNumpy(filename, shape, u64Data);
+
+        bShape.push_back(shape[0]/2);
+
+        for (size_t i = 0; i < u64Data.size(); i += 4)
+        {
+            Tuple t0, t1;
+
+            t0.key = u64Data[i];
+            t0.value = u64Data[i + 1];
+
+            t1.key = u64Data[i + 2];
+            t1.value = u64Data[i + 3];
+
+            BurstType burst(t0, t1);
+            bData.push_back(burst);
+        }
+    }
+
+    // Load uint64
     void loadInt64(string filename)
     {
         npy::LoadArrayFromNumpy(filename, shape, u64Data);

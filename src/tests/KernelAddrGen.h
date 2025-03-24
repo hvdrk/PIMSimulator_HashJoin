@@ -83,6 +83,7 @@ class PIMAddrManager
     AddressMappingScheme address_mapping_scheme_;
 };
 
+// new kernel type JOIN
 enum class KernelType
 {
     ADD,
@@ -90,6 +91,7 @@ enum class KernelType
     RELU,
     GEMV,
     MUL,
-    GEMVTREE
+    GEMVTREE,
+    JOIN    //new
 };
 #endif

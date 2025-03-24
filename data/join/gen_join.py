@@ -1,7 +1,7 @@
 import numpy as np
 
-inner_size = 10     # within data type range. uint64 : under 2^64
-outer_size = 10
+inner_size = 16     # within data type range. uint64 : under 2^64
+outer_size = 16
 
 data_type = np.uint64
 # data_type = np.uint32
@@ -23,5 +23,8 @@ print(f"outer_rel : (shape: {outer_rel.shape}):")
 print(outer_rel)
 
 v2_sum = np.sum(v2)
-np.save("sum", v2_sum)
-print("sum", v2_sum)
+print(v2_sum)
+result = np.array([v2_sum, 0, 0, 0], dtype=data_type)
+np.save("result", result)
+
+print(f"result : {result}")
