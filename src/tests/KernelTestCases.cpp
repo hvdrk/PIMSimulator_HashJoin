@@ -158,13 +158,16 @@ TEST_F(PIMKernelFixture, join)
     DataDim *dim_data = new DataDim(KernelType::JOIN, 1, output_dim, input_dim, input1_dim, true);
     dim_data->printDim(KernelType::JOIN);
 
-    result_ = getResultPIM(KernelType::JOIN, dim_data, kernel, result_);    // not changed getResultPim() yet
+    result_ = getResultPIM(KernelType::JOIN, dim_data, kernel, result_);
     kernel->runPIM();
 
     testStatsClear();
 
     //for load test
-    expectAccuracy(KernelType::JOIN, dim_data->input_npbst_.getTotalDim(), dim_data->input_npbst_);
+    std::cout << "\nTesting input1_npbst_ uploaded correctly" << std::endl;
+    // expectAccuracy(KernelType::JOIN, dim_data->input_npbst_.getTotalDim(), dim_data->input0_npbst_);
+    expectAccuracy(KernelType::JOIN, dim_data->input_npbst_.getTotalDim(), dim_data->input1_npbst_);
+    
 
     delete[] result_;
     delete dim_data;

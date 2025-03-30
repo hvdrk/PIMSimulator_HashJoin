@@ -29,7 +29,7 @@ enum class PIMCmdType   // total 16 -> 4 bits
     MUL,
     MAC,
     MAD,
-    REV0,   // dummy
+    PART,   
     REV1,   // dummy
     REV2,   // dummy
     MOV,
@@ -50,8 +50,10 @@ enum class PIMOpdType   // total 8 -> 3bits
     ODD_BANK,
     GRF_A,
     GRF_B,
-    SRF_M,
-    SRF_A
+    // SRF_M,
+    // SRF_A
+    SRAM,
+    BANK
 };
 
 class PIMCmd
@@ -197,10 +199,14 @@ class PIMCmd
                 return "GRF_A[" + to_string(idx) + "]";
             case PIMOpdType::GRF_B:
                 return "GRF_B[" + to_string(idx) + "]";
-            case PIMOpdType::SRF_M:
-                return "SRF_M[" + to_string(idx) + "]";
-            case PIMOpdType::SRF_A:
-                return "SRF_A[" + to_string(idx) + "]";
+            // case PIMOpdType::SRF_M:
+            //     return "SRF_M[" + to_string(idx) + "]";
+            // case PIMOpdType::SRF_A:
+            //     return "SRF_A[" + to_string(idx) + "]";
+            case PIMOpdType::SRAM:
+                return "SRAM";
+            case PIMOpdType::BANK:
+                return "BANK";
             default:
                 return "NOT_DEFINED";
         }

@@ -106,6 +106,9 @@ class PIMKernel
     void readData(BurstType* bst_data, size_t bst_cnt, unsigned s_row = 0, unsigned s_col = 0);
     void adderTree(BurstType* result, int output_dim, int numTile, int step, fp16* temp);
 
+    void executeFirstPartition(int dim0, int dim1, pimBankType bank_types, KernelType ktype, int input0_row,
+        int input1_row);
+
   private:
     unsigned cycle_;
     unsigned num_banks_, num_pim_blocks_, num_bank_groups_, num_total_pim_blocks_;

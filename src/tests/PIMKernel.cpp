@@ -331,10 +331,6 @@ void PIMKernel::preloadNoReplacement(NumpyBurstType* operand, unsigned starting_
     {
         uint64_t addr = init_addr + x * transaction_size_;
         mem_->addTransaction(true, addr, &operand->bData[x]);
-
-        if (x < 4) {
-            std::cout << x << "'th burst's first data is" << operand->bData[x].u16Data_[0] << std::endl;
-        }
     }
 }
 /*
@@ -598,7 +594,7 @@ void PIMKernel::readData(BurstType* bst_data, size_t bst_cnt, unsigned starting_
 {
     uint64_t init_addr = pim_addr_mgr_->addrGenSafe(0, 0, 0, 0, starting_row, starting_col);
 
-    std::cout << "bst_cnt is " << bst_cnt << std::endl;
+    // std::cout << "bst_cnt is " << bst_cnt << std::endl;
 
     for (uint64_t addr = init_addr, i = 0; i < bst_cnt; addr += transaction_size_, i++)
     {
@@ -634,31 +630,32 @@ void PIMKernel::adderTree(BurstType* result, int output_dim, int num_tile, int s
 }
 
 
-// void PIMKernel::executeFirstPartition(int dim, pimBankType pb_type, KernelType ktype, int input0_row,
-//     int result_row, int input1_row)
-// {
-// int num_tile = dim / (num_banks_ * num_pim_chans_ * num_pim_ranks_ * num_grf_);
-// int num_jump_to_be_taken = num_tile - 1;
-// vector<PIMCmd> pim_cmds = PIMCmdGen::getPIMCmds(ktype, num_jump_to_be_taken, 0, 0);
+void PIMKernel::executeFirstPartition(int dim0, int dim1, pimBankType pb_type, KernelType ktype, int input0_row,
+    int input1_row)
+{
+    // int num_tile = dim / (num_banks_ * num_pim_chans_ * num_pim_ranks_ * num_grf_);
+    // int num_jump_to_be_taken = num_tile - 1;
+    // vector<PIMCmd> pim_cmds = PIMCmdGen::getPIMCmds(ktype, num_jump_to_be_taken, 0, 0);
 
-// // for (int i = 0; i < pim_cmds.size(); i++) {
-// //     std::cout << pim_cmds[i].toStr();
-// // }
+    // // for (int i = 0; i < pim_cmds.size(); i++) {
+    // //     std::cout << pim_cmds[i].toStr();
+    // // }
 
-// setControl(&bst_hab_pim_, true, getToggleCond(pb_type), false, false);
-// setControl(&bst_hab_, false, getToggleCond(pb_type), false, false);
+    // setControl(&bst_hab_pim_, true, getToggleCond(pb_type), false, false);
+    // setControl(&bst_hab_, false, getToggleCond(pb_type), false, false);
 
-// parkIn();
-// changePIMMode(dramMode::SB, dramMode::HAB);
-// programCrf(pim_cmds);
-// changePIMMode(dramMode::HAB, dramMode::HAB_PIM);
+    // parkIn();
+    // changePIMMode(dramMode::SB, dramMode::HAB);
+    // programCrf(pim_cmds);
+    // changePIMMode(dramMode::HAB, dramMode::HAB_PIM);
 
-// if (ktype == KernelType::ADD || ktype == KernelType::MUL)
-// computeAddOrMul(num_tile, input0_row, result_row, input1_row);
-// else if (ktype == KernelType::RELU)
-// computeRelu(num_tile, input0_row, result_row);
+    // if (ktype == KernelType::ADD || ktype == KernelType::MUL)
+    // computeAddOrMul(num_tile, input0_row, result_row, input1_row);
+    // else if (ktype == KernelType::RELU)
+    // computeRelu(num_tile, input0_row, result_row);
 
-// changePIMMode(dramMode::HAB_PIM, dramMode::HAB);
-// changePIMMode(dramMode::HAB, dramMode::SB);
-// parkOut();
-// }
+    // changePIMMode(dramMode::HAB_PIM, dramMode::HAB);
+    // changePIMMode(dramMode::HAB, dramMode::SB);
+    // parkOut();
+    return;
+}

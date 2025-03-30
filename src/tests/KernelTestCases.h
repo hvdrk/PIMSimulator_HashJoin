@@ -24,8 +24,12 @@ using namespace DRAMSim;
 ::testing::AssertionResult fp16EqualHelper(const char* m_expr, const char* n_expr, fp16 m, fp16 n);
 ::testing::AssertionResult fp16BstEqualHelper(const char* m_expr, const char* n_expr,
                                               DRAMSim::BurstType mb, DRAMSim::BurstType nb);
+::testing::AssertionResult TupleBstEqualHelper(const char* m_expr, const char* n_expr,
+                                              DRAMSim::BurstType mb, DRAMSim::BurstType nb);
 #define EXPECT_FP16_BST_EQ(val1, val2) EXPECT_PRED_FORMAT2(fp16BstEqualHelper, val1, val2)
 #define EXPECT_FP16_EQ(val1, val2) EXPECT_PRED_FORMAT2(fp16EqualHelper, val1, val2)
+#define EXPECT_TUPLE_BST_EQ(val1, val2) EXPECT_PRED_FORMAT2(TupleBstEqualHelper, val1, val2)
+
 
 class TestStats
 {
@@ -161,7 +165,7 @@ class PIMKernelFixture : public testing::Test
             case KernelType::JOIN:
             {
                 int input_row0 = 0;
-                int input_row1 = 16384/2; // NUM_ROWS / 2
+                int input_row1 = 16384/4; // NUM_ROWS / 4 -> middle of DRAM seg
                 kernel->preloadNoReplacement(&dim_data->input_npbst_, input_row0, 0);
                 kernel->preloadNoReplacement(&dim_data->input1_npbst_, input_row1, 0);
                 
@@ -169,20 +173,20 @@ class PIMKernelFixture : public testing::Test
                 /////////////////////////////////////////////////
                 // for load test
                 /////////////////////////////////////////////////
-                result = new BurstType[dim_data->input_npbst_.getTotalDim()];
-                kernel->readData(result, dim_data->input_npbst_.getTotalDim(), input_row0, 0);
 
-                // result = new BurstType[dim_data->input1_npbst_.getTotalDim()];
-                // kernel->readData(result, dim_data->input1_npbst_.getTotalDim(), input_row1, 0);
+                // test input 0
+                // result = new BurstType[dim_data->input_npbst_.getTotalDim()];
+                // kernel->readData(result, dim_data->input_npbst_.getTotalDim(), input_row0, 0);
+
+                //test input 1
+                result = new BurstType[dim_data->input1_npbst_.getTotalDim()];
+                kernel->readData(result, dim_data->input1_npbst_.getTotalDim(), input_row1, 0);
                 /////////////////////////////////////////////////
 
 
-                kernel->executeFirstPartition(dim_data->dimTobShape(dim_data->output_dim_),
-                                       pimBankType::ALL_BANK, kn_type, input_row0, result_row,
-                                       input_row1);
-
-
-
+                // kernel->executeFirstPartition(dim_data->input_npbst_.getTotalDim(),
+                //                        dim_data->input1_npbst_.getTotalDim(),
+                //                        pimBankType::ALL_BANK, kn_type, input_row0, input_row1);
 
                 break;
             }
@@ -225,11 +229,23 @@ class PIMKernelFixture : public testing::Test
             case KernelType::JOIN:
             {
                 // for load test
+                bool is_correct = true;
                 for (int i = 0; i < num_tests; i++)
                 {
                     EXPECT_TUPLE_BST_EQ(result_[i], precalculated_result.getBurst(i));
+                    bool burst_correct = EXPECT_TUPLE_BST_EQ_DEBUG(result_[i], precalculated_result.getBurst(i));
+                    if (!burst_correct) {
+                        is_correct = false;
+                    }
                 }
-                std::cout << "all burst correct. burst num is " << num_tests << std::endl;
+
+                if (is_correct) {
+                    std::cout << "\nAll burst correct. Total num of tested burst is " << num_tests << std::endl;
+                }
+                else {
+                    std::cout << "\nSomething wrong... Total num of tested burst is " << num_tests << std::endl;
+                }
+                
                 return;
             }
             default:
@@ -240,7 +256,9 @@ class PIMKernelFixture : public testing::Test
         }
     }
 
-    void EXPECT_TUPLE_BST_EQ(BurstType result, BurstType answer) {
+    bool EXPECT_TUPLE_BST_EQ_DEBUG(BurstType result, BurstType answer) {
+
+        bool is_correct = true;
         for (int i = 0; i < 4; i++) {
 
             // std::cout << "result : (" << result.TupleData_[i].key << ", " << result.TupleData_[i].value << ")" << std::endl;
@@ -252,9 +270,10 @@ class PIMKernelFixture : public testing::Test
                 std::cout << "result : (" << result.TupleData_[i].key << ", " << result.TupleData_[i].value << ")" << std::endl;
                 std::cout << "answer : (" << answer.TupleData_[i].key << ", " << answer.TupleData_[i].value << ")" << std::endl;
                 ERROR("== Error - Wrong result");
+                is_correct = false;
             }
         }
-        return;
+        return is_correct;
     }
 
     shared_ptr<PIMKernel> make_pim_kernel()
@@ -362,5 +381,44 @@ class PIMKernelFixture : public testing::Test
     }
 
     return ::testing::AssertionSuccess();
+}
+
+::testing::AssertionResult TupleBstEqualHelper(const char* m_expr, const char* n_expr, BurstType mb,
+    BurstType nb)
+{
+for (int i = 0; i < 4; i++)
+{
+    Tuple m = mb.TupleData_[i];
+    Tuple n = nb.TupleData_[i];
+
+    if ((m.key == n.key) && (m.value == n.value)) {
+        INC_NUM_PASSED();
+    }
+    else {
+        INC_NUM_FAILED();
+        return ::testing::AssertionFailure();
+    }
+
+    return ::testing::AssertionSuccess();
+
+    // if (fp16Equal(m, n, 4, 0.01))
+    // {
+    // INC_NUM_PASSED();
+    // }
+    // else if (fp16Equal(m, n, 256, 0.7))
+    // {
+    // INC_NUM_PASSED();
+    // }
+    // else
+    // {
+    // INC_NUM_FAILED();
+    // INSERT_TO_FAILED_VECTOR(convertH2F(m), convertH2F(n));
+    // return ::testing::AssertionFailure()
+    // << m_expr << " and " << n_expr << " (" << convertH2F(m) << " and "
+    // << convertH2F(n) << ") are not same " << mi.ival << " " << ni.ival;
+    // }
+}
+
+return ::testing::AssertionSuccess();
 }
 #endif

@@ -262,11 +262,15 @@ void PIMRank::readOpd(int pb, BurstType& bst, PIMOpdType type, BusPacket* packet
             else
                 bst = pimBlocks[pb].grfB[idx];
             return;
-        case PIMOpdType::SRF_M:
-            bst.set(pimBlocks[pb].srf.fp16Data_[idx]);
+        // case PIMOpdType::SRF_M:
+        //     bst.set(pimBlocks[pb].srf.fp16Data_[idx]);
+        //     return;
+        // case PIMOpdType::SRF_A:
+        //     bst.set(pimBlocks[pb].srf.fp16Data_[idx + 8]);
+        //     return;
+        case PIMOpdType::SRAM:
             return;
-        case PIMOpdType::SRF_A:
-            bst.set(pimBlocks[pb].srf.fp16Data_[idx + 8]);
+        case PIMOpdType::BANK:
             return;
     }
 }
@@ -311,18 +315,16 @@ void PIMRank::writeOpd(int pb, BurstType& bst, PIMOpdType type, BusPacket* packe
             else
                 pimBlocks[pb].grfB[idx] = bst;
             return;
-        case PIMOpdType::SRF_M:
-            pimBlocks[pb].srf = bst;
-            return;
-        case PIMOpdType::SRF_A:
-            pimBlocks[pb].srf = bst;
-            return;
-        // case PIMOpdType::SRAM_A;
-        //     pimBlocks[pb].sramA[idx] = bst;
+        // case PIMOpdType::SRF_M:
+        //     pimBlocks[pb].srf = bst;
         //     return;
-        // case PIMOpdType::SRAM_B;
-        //     pimBlocks[pb].sramB[idx] = bst;
+        // case PIMOpdType::SRF_A:
+        //     pimBlocks[pb].srf = bst;
         //     return;
+        case PIMOpdType::SRAM:
+            return;
+        case PIMOpdType::BANK:
+            return;
     }
 }
 
@@ -408,7 +410,15 @@ void PIMRank::doPIM(BusPacket* packet)
 
             for (int pimblock_id = 0; pimblock_id < config.NUM_PIM_BLOCKS; pimblock_id++)
             {
-                doPIMBlock(packet, cCmd, pimblock_id);
+                //////////////////////////////////////////////////////////////////
+                if (pimblock_id < 8) {
+                    doPIMBlock(packet, cCmd, pimblock_id);
+                }
+                else if ((cCmd.type_ == PIMCmdType::PART) && (config.NUM_PIM_BLOCKS == 16)) {
+                    doPIMBlock(packet, cCmd, pimblock_id);
+                }
+                //////////////////////////////////////////////////////////////////
+
 
                 if (DEBUG_PIM_BLOCK && pimblock_id == 0)
                 {
@@ -418,11 +428,6 @@ void PIMRank::doPIM(BusPacket* packet)
                     PRINT("----------");
                 }
 
-                // if (pimblock_id == 4)
-                // {
-                //     std::cout << "pimblock_id is " << pimblock_id << std::endl;
-                //     std::cout << "pimblock_id is " << pimblock_id << std::endl;
-                // }
             }
         }
         pimPC_++;
@@ -466,10 +471,6 @@ void PIMRank::doPIMBlock(BusPacket* packet, PIMCmd cCmd, int pimblock_id)
 
         writeOpd(pimblock_id, dstBst, cCmd.dst_, packet, cCmd.dstIdx_, cCmd.isAuto_, false);
         // dstBst.fp16Data_[i] = src0Bst.fp16Data_[i] * src1Bst.fp16Data_[i] + src2Bst.fp16Data_[i];
-        // if (pimblock_id == 4)
-        // {
-        //     std::cout << "pimblock_id is " << pimblock_id << ", dstBst[0] is " << dstBst.fp16Data_[0] << std::endl;
-        // }
     }
     else if (cCmd.type_ == PIMCmdType::MAC || cCmd.type_ == PIMCmdType::MAD)
     {
@@ -510,20 +511,20 @@ void PIMRank::doPIMBlock(BusPacket* packet, PIMCmd cCmd, int pimblock_id)
             rank->banks[pimblock_id * 2 + 1].write(packet);  // basically read from bank.
         }
     }
-    // else if (cCmd.type_ == PIMCmdType::PART)
-    // {
-    //     BurstType dstBst;
-    //     BurstType srcBst;
+    else if (cCmd.type_ == PIMCmdType::PART)
+    {
+        BurstType dstBst;
+        BurstType srcBst;
 
-    //     unsigned int bit_len = cCmd.;
-    //     unsigned int bit_pos = 0;
+        // unsigned int bit_len = cCmd.;
+        // unsigned int bit_pos = 0;
 
-    //     pimBlocks[pimblock_id].hash(dstBst, srcBst, bit_len, pit_pos);
+        // pimBlocks[pimblock_id].hash(dstBst, srcBst, bit_len, pit_pos);
         
-    //     for (int i = 0; i < 4; i++)
-    //     {
-    //         writeOpd(dstBst.u32Data_[i] , srcBst, cCmd.dst_, packet, cCmd.dstIdx_, cCmd.isAuto_, false);
-    //     }
+        // for (int i = 0; i < 4; i++)
+        // {
+        //     writeOpd(dstBst.u32Data_[i] , srcBst, cCmd.dst_, packet, cCmd.dstIdx_, cCmd.isAuto_, false);
+        // }
         
-    // }
+    }
 }
