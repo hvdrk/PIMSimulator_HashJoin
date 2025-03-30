@@ -224,18 +224,24 @@ class DataDim
             case KernelType::JOIN:
             {
                 input_npbst_.loadTuple("data/join/inner.npy");
-                // std::cout << "data/join/inner.npy loaded " << std::endl;
+                input_dim_ = input_npbst_.getTotalDim() * 4;
+
 
                 input1_npbst_.loadTuple("data/join/outer.npy");
-                // std::cout << "data/join/outer.npy loaded " << std::endl;
-
-                output_npbst_.loadInt32("data/join/result.npy");
-                // std::cout << "data/join/result.npy loaded " << std::endl;
-
-
-                input_dim_ = input_npbst_.getTotalDim() * 4;
                 input1_dim_ = input1_npbst_.getTotalDim() * 4;
+
+
+                //for join
+                output_npbst_.loadInt32("data/join/result.npy");
                 output_dim_ = output_npbst_.getTotalDim() * 8;
+
+                // //for test load
+                // output_npbst_.loadInt32("data/join/result.npy");
+                // output_dim_ = output_npbst_.getTotalDim() * 8;
+
+
+
+
 
 
                 std::cout << "input_dim_ : " << input_dim_ << std::endl;

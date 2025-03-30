@@ -140,6 +140,8 @@ class PIMKernelFixture : public testing::Test
                                        pimBankType::ALL_BANK, kn_type, input_row0, result_row,
                                        input_row1);
                 result = new BurstType[dim_data->output_dim_];
+                std::cout << "dim_data->output_dim_ is " << dim_data->output_dim_ << std::endl;
+                std::cout << "dim_data->dimTobShape(dim_data->output_dim_) is " << dim_data->dimTobShape(dim_data->output_dim_) << std::endl;
                 kernel->readData(result, dim_data->dimTobShape(dim_data->output_dim_), result_row,
                                  0);
                 break;
@@ -160,15 +162,28 @@ class PIMKernelFixture : public testing::Test
             {
                 int input_row0 = 0;
                 int input_row1 = 16384/2; // NUM_ROWS / 2
-                // int result_row = 256;
                 kernel->preloadNoReplacement(&dim_data->input_npbst_, input_row0, 0);
                 kernel->preloadNoReplacement(&dim_data->input1_npbst_, input_row1, 0);
+                
+
+                /////////////////////////////////////////////////
+                // for load test
+                /////////////////////////////////////////////////
+                result = new BurstType[dim_data->input_npbst_.getTotalDim()];
+                kernel->readData(result, dim_data->input_npbst_.getTotalDim(), input_row0, 0);
+
+                // result = new BurstType[dim_data->input1_npbst_.getTotalDim()];
+                // kernel->readData(result, dim_data->input1_npbst_.getTotalDim(), input_row1, 0);
+                /////////////////////////////////////////////////
+
+
                 kernel->executeFirstPartition(dim_data->dimTobShape(dim_data->output_dim_),
                                        pimBankType::ALL_BANK, kn_type, input_row0, result_row,
                                        input_row1);
-                // result = new BurstType[dim_data->output_dim_];
-                // kernel->readData(result, dim_data->dimTobShape(dim_data->output_dim_), result_row,
-                //                  0);
+
+
+
+
                 break;
             }
             case KernelType::GEMVTREE:
@@ -207,12 +222,39 @@ class PIMKernelFixture : public testing::Test
                 }
                 return;
             }
+            case KernelType::JOIN:
+            {
+                // for load test
+                for (int i = 0; i < num_tests; i++)
+                {
+                    EXPECT_TUPLE_BST_EQ(result_[i], precalculated_result.getBurst(i));
+                }
+                std::cout << "all burst correct. burst num is " << num_tests << std::endl;
+                return;
+            }
             default:
             {
                 ERROR("== Error - Unknown KernelType trying to run");
                 return;
             }
         }
+    }
+
+    void EXPECT_TUPLE_BST_EQ(BurstType result, BurstType answer) {
+        for (int i = 0; i < 4; i++) {
+
+            // std::cout << "result : (" << result.TupleData_[i].key << ", " << result.TupleData_[i].value << ")" << std::endl;
+            // std::cout << "answer : (" << answer.TupleData_[i].key << ", " << answer.TupleData_[i].value << ")" << std::endl;
+
+            if ((result.TupleData_[i].key != answer.TupleData_[i].key) ||
+                (result.TupleData_[i].value != answer.TupleData_[i].value)) 
+            {
+                std::cout << "result : (" << result.TupleData_[i].key << ", " << result.TupleData_[i].value << ")" << std::endl;
+                std::cout << "answer : (" << answer.TupleData_[i].key << ", " << answer.TupleData_[i].value << ")" << std::endl;
+                ERROR("== Error - Wrong result");
+            }
+        }
+        return;
     }
 
     shared_ptr<PIMKernel> make_pim_kernel()

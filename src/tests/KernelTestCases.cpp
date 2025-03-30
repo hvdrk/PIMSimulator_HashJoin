@@ -159,11 +159,13 @@ TEST_F(PIMKernelFixture, join)
     dim_data->printDim(KernelType::JOIN);
 
     result_ = getResultPIM(KernelType::JOIN, dim_data, kernel, result_);    // not changed getResultPim() yet
-    // kernel->runPIM();
+    kernel->runPIM();
 
-    // testStatsClear();
-    // expectAccuracy(KernelType::JOIN, dim_data->dimTobShape(output_dim), dim_data->output_npbst_);
+    testStatsClear();
 
-    // delete[] result_;
+    //for load test
+    expectAccuracy(KernelType::JOIN, dim_data->input_npbst_.getTotalDim(), dim_data->input_npbst_);
+
+    delete[] result_;
     delete dim_data;
 }
