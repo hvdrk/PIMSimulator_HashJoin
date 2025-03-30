@@ -272,10 +272,10 @@ class PIMBenchFixture : public testing::Test
         }
         ////////////////////////////////////////////////////////////////////////////////////
         // need to change
-        else if (k = KernelType::JOIN)
-        {
-            // perfTest = ;
-        }
+        // else if (k = =KernelType::JOIN)
+        // {
+        //     // perfTest = ;
+        // }
         else
         {
             throw invalid_argument("Invalid kernel type");

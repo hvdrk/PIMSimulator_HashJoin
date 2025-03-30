@@ -23,6 +23,8 @@
 using namespace std;
 using namespace DRAMSim;
 
+// static int l=0;
+
 class IPIMCmd
 {
   public:
@@ -58,6 +60,7 @@ class EltwisePIMKernel : public IPIMCmd
             pim_cmds.push_back(PIMCmd(PIMCmdType::JUMP, num_jump_to_be_taken, pim_cmds.size() + 1));
         }
         pim_cmds.push_back(PIMCmd(PIMCmdType::EXIT, 0));
+        // std::cout << "l is " << l++ << std::endl;
         return pim_cmds;
     }
 

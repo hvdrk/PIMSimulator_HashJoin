@@ -331,6 +331,10 @@ void PIMKernel::preloadNoReplacement(NumpyBurstType* operand, unsigned starting_
     {
         uint64_t addr = init_addr + x * transaction_size_;
         mem_->addTransaction(true, addr, &operand->bData[x]);
+
+        if (x < 4) {
+            std::cout << x << "'th burst's first data is" << operand->bData[x].u16Data_[0] << std::endl;
+        }
     }
 }
 /*
@@ -503,6 +507,10 @@ void PIMKernel::executeEltwise(int dim, pimBankType pb_type, KernelType ktype, i
     int num_jump_to_be_taken = num_tile - 1;
     vector<PIMCmd> pim_cmds = PIMCmdGen::getPIMCmds(ktype, num_jump_to_be_taken, 0, 0);
 
+    // for (int i = 0; i < pim_cmds.size(); i++) {
+    //     std::cout << pim_cmds[i].toStr();
+    // }
+
     setControl(&bst_hab_pim_, true, getToggleCond(pb_type), false, false);
     setControl(&bst_hab_, false, getToggleCond(pb_type), false, false);
 
@@ -621,4 +629,34 @@ void PIMKernel::adderTree(BurstType* result, int output_dim, int num_tile, int s
     adderTree(result, output_dim, ceil(double(num_tile) / (double)2), step + 1, temp);
 
     return;
+}
+
+
+void PIMKernel::executeFirstPartition(int dim, pimBankType pb_type, KernelType ktype, int input0_row,
+    int result_row, int input1_row)
+{
+int num_tile = dim / (num_banks_ * num_pim_chans_ * num_pim_ranks_ * num_grf_);
+int num_jump_to_be_taken = num_tile - 1;
+vector<PIMCmd> pim_cmds = PIMCmdGen::getPIMCmds(ktype, num_jump_to_be_taken, 0, 0);
+
+// for (int i = 0; i < pim_cmds.size(); i++) {
+//     std::cout << pim_cmds[i].toStr();
+// }
+
+setControl(&bst_hab_pim_, true, getToggleCond(pb_type), false, false);
+setControl(&bst_hab_, false, getToggleCond(pb_type), false, false);
+
+parkIn();
+changePIMMode(dramMode::SB, dramMode::HAB);
+programCrf(pim_cmds);
+changePIMMode(dramMode::HAB, dramMode::HAB_PIM);
+
+if (ktype == KernelType::ADD || ktype == KernelType::MUL)
+computeAddOrMul(num_tile, input0_row, result_row, input1_row);
+else if (ktype == KernelType::RELU)
+computeRelu(num_tile, input0_row, result_row);
+
+changePIMMode(dramMode::HAB_PIM, dramMode::HAB);
+changePIMMode(dramMode::HAB, dramMode::SB);
+parkOut();
 }

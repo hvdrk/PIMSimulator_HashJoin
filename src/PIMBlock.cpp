@@ -21,13 +21,19 @@
 
 using namespace DRAMSim;
 
+// static int num = 0;
+
 void PIMBlock::add(BurstType& dstBst, BurstType& src0Bst, BurstType& src1Bst)
 {
+    // std::cout << "add " << std::endl;
+
     if (pimPrecision_ == FP16)
     {
         for (int i = 0; i < 16; i++)
         {
             dstBst.fp16Data_[i] = src0Bst.fp16Data_[i] + src1Bst.fp16Data_[i];
+            // std::cout << "NUM:" << num++ << " ADD" <<src0Bst.fp16Data_[i] << " + " << src1Bst.fp16Data_[i] << " = " << dstBst.fp16Data_[i] << std::endl;
+
         }
     }
     else if (pimPrecision_ == FP32)
@@ -35,6 +41,7 @@ void PIMBlock::add(BurstType& dstBst, BurstType& src0Bst, BurstType& src1Bst)
         for (int i = 0; i < 8; i++)
         {
             dstBst.fp32Data_[i] = src0Bst.fp32Data_[i] + src1Bst.fp32Data_[i];
+            // std::cout << "NUM:" << num++ << " ADD" << src0Bst.fp32Data_[i] << " + " << src1Bst.fp32Data_[i] << " = " << dstBst.fp32Data_[i] << std::endl;
         }
     }
     else
@@ -105,6 +112,18 @@ void PIMBlock::mad(BurstType& dstBst, BurstType& src0Bst, BurstType& src1Bst, Bu
     else
         dstBst = src0Bst * src1Bst + src2Bst;
 }
+
+// void PIMBlock::hash(BurstType& dstBst, BurstType& srcBst, unsigned int bit_len, unsigned int bit_pos)
+// {
+//     if (pimPrecision_ == INT32) // precision 추가
+//     {
+//         for (int i = 0; i < 4; i++)
+//         {
+//             dstBst.u32Data_[i] = ((srcBst.TupleData_[i].key >> bit_pos) & (1 << bit_len - 1));
+//         }
+//     }
+// }
+
 
 std::string PIMBlock::print()
 {

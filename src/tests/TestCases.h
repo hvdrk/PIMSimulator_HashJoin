@@ -44,7 +44,7 @@ class MemBandwidthFixture : public testing::Test
     {
         cur_cycle = 0;
         mem = make_shared<MultiChannelMemorySystem>("ini/HBM2_samsung_2M_16B_x64.ini",
-                                                    "system_hbm.ini", ".", "example_app", 256 * 16);
+                                                    "system_hbm_1ch.ini", ".", "example_app", 256 * 16);
         mem_size = (uint64_t)getConfigParam(UINT, "NUM_CHANS") * getConfigParam(UINT, "NUM_RANKS") *
                    getConfigParam(UINT, "NUM_BANK_GROUPS") * getConfigParam(UINT, "NUM_BANKS") *
                    getConfigParam(UINT, "NUM_ROWS") * getConfigParam(UINT, "NUM_COLS");
@@ -186,6 +186,8 @@ class DataDim
             }
             case KernelType::ADD:
             {
+                // input_npbst_.loadTuple("data/join/inner.npy");
+
                 input_npbst_.loadFp16("data/add/resadd_input0_" + input_dim_str + ".npy");
                 input1_npbst_.loadFp16("data/add/resadd_input1_" + input_dim_str + ".npy");
                 output_npbst_.loadFp16("data/add/resadd_output_" + input_dim_str + ".npy");
@@ -222,12 +224,53 @@ class DataDim
             case KernelType::JOIN:
             {
                 input_npbst_.loadTuple("data/join/inner.npy");
-                input1_npbst_.loadTuple("data/join/outer.npy");
-                output_npbst_.loadInt64("data/join/sum.npy");
+                // std::cout << "data/join/inner.npy loaded " << std::endl;
 
-                output_dim_ = bShape1ToDim(output_npbst_.getTotalDim());
-                input_dim_ = bShape1ToDim(input_npbst_.getTotalDim());
-                input1_dim_ = bShape1ToDim(input1_npbst_.getTotalDim());
+                input1_npbst_.loadTuple("data/join/outer.npy");
+                // std::cout << "data/join/outer.npy loaded " << std::endl;
+
+                output_npbst_.loadInt32("data/join/result.npy");
+                // std::cout << "data/join/result.npy loaded " << std::endl;
+
+
+                input_dim_ = input_npbst_.getTotalDim() * 4;
+                input1_dim_ = input1_npbst_.getTotalDim() * 4;
+                output_dim_ = output_npbst_.getTotalDim() * 8;
+
+
+                std::cout << "input_dim_ : " << input_dim_ << std::endl;
+                std::cout << "input1_dim_ : " << input1_dim_ << std::endl;
+                std::cout << "output_dim_ : " << output_dim_ << std::endl;
+
+                std::cout << "\n input data" << std::endl;
+                for (int i=0; i<input_dim_/4; i++) {
+                    std::cout << i << "'th burst is" << std::endl;
+                    for (int j=0; j<4; j++) {
+                        std::cout << "(" << input_npbst_.bData[i].TupleData_[j].key << "," << input_npbst_.bData[i].TupleData_[j].value << ") , ";
+                    }
+                    std::cout << std::endl;
+                }
+
+                std::cout << "\n input1 data" << std::endl;
+                for (int i=0; i<input1_dim_/4; i++) {
+                    std::cout << i << "'th burst is" << std::endl;
+                    for (int j=0; j<4; j++) {
+                        std::cout << "(" << input1_npbst_.bData[i].TupleData_[j].key << "," << input1_npbst_.bData[i].TupleData_[j].value << ") , ";
+                    }
+                    std::cout << std::endl;
+                }
+
+                std::cout << "\n output data" << std::endl;
+                for (int i=0; i<output_dim_/8; i++) {
+                    std::cout << i << "'th burst is" << std::endl;
+                    for (int j=0; j<8; j++) {
+                        std::cout << output_npbst_.bData[i].u32Data_[j] << ", ";
+                    }
+                    std::cout << std::endl;
+                }
+
+                return;
+
             }
             default:
             {
@@ -392,7 +435,7 @@ class DataDim
                 cout << "  Input data (inner) dimension : " << input_dim_ << endl;
                 cout << "  Input1 data (outer) dimension : " << input1_dim_ << endl;
                 cout << "  Output data dimension : " << output_dim_ << endl;
-
+                break;
             }
             default:
             {

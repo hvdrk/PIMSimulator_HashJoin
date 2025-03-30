@@ -94,6 +94,7 @@ void Bank::write(const BusPacket* busPacket)
     // TODO: move all the error checking to BusPacket so once we have a bus
     // packet,
     //            we know the fields are all legal
+    // std::cout << "numCols is " << numCols << std::endl;
 
     if (busPacket->column >= numCols)
     {

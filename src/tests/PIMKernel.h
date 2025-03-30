@@ -41,7 +41,7 @@ class PIMKernel
           cycle_(0)
     {
         transaction_size_ = getConfigParam(UINT, "BL") *
-                            (getConfigParam(UINT, "JEDEC_DATA_BUS_BITS") / 8);  // in byte
+                            (getConfigParam(UINT, "JEDEC_DATA_BUS_BITS") / 8);  // in byte. -> 32byte
 
         // FIXME: HARDCODED
         num_grf_ = num_grfA_ = num_grfB_ = 8;

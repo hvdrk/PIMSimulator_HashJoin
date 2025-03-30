@@ -317,8 +317,16 @@ void PIMRank::writeOpd(int pb, BurstType& bst, PIMOpdType type, BusPacket* packe
         case PIMOpdType::SRF_A:
             pimBlocks[pb].srf = bst;
             return;
+        // case PIMOpdType::SRAM_A;
+        //     pimBlocks[pb].sramA[idx] = bst;
+        //     return;
+        // case PIMOpdType::SRAM_B;
+        //     pimBlocks[pb].sramB[idx] = bst;
+        //     return;
     }
 }
+
+// static int num = 0;
 
 void PIMRank::doPIM(BusPacket* packet)
 {
@@ -326,7 +334,13 @@ void PIMRank::doPIM(BusPacket* packet)
     packet->row = masked2accessibleRA(packet->row);
     do
     {
+        
         cCmd.fromInt(crf.data[pimPC_]);
+        // if (cCmd.toStr() != "NOP 8x") {
+        //     std::cout << "num = " << num++ << std::endl;
+        //     std::cout << "cmd is " << cCmd.toStr() << std::endl;
+        // }
+        // std::cout << "cmd is " << cCmd.toStr() << std::endl;
         if (DEBUG_CMD_TRACE)
         {
             PRINTC(CYAN, string((packet->busPacketType == READ) ? "READ ch" : "WRITE ch")
@@ -403,6 +417,12 @@ void PIMRank::doPIM(BusPacket* packet)
                     PRINT(pimBlocks[pimblock_id].print());
                     PRINT("----------");
                 }
+
+                // if (pimblock_id == 4)
+                // {
+                //     std::cout << "pimblock_id is " << pimblock_id << std::endl;
+                //     std::cout << "pimblock_id is " << pimblock_id << std::endl;
+                // }
             }
         }
         pimPC_++;
@@ -445,6 +465,11 @@ void PIMRank::doPIMBlock(BusPacket* packet, PIMCmd cCmd, int pimblock_id)
             pimBlocks[pimblock_id].mul(dstBst, src0Bst, src1Bst);
 
         writeOpd(pimblock_id, dstBst, cCmd.dst_, packet, cCmd.dstIdx_, cCmd.isAuto_, false);
+        // dstBst.fp16Data_[i] = src0Bst.fp16Data_[i] * src1Bst.fp16Data_[i] + src2Bst.fp16Data_[i];
+        // if (pimblock_id == 4)
+        // {
+        //     std::cout << "pimblock_id is " << pimblock_id << ", dstBst[0] is " << dstBst.fp16Data_[0] << std::endl;
+        // }
     }
     else if (cCmd.type_ == PIMCmdType::MAC || cCmd.type_ == PIMCmdType::MAD)
     {
@@ -485,4 +510,20 @@ void PIMRank::doPIMBlock(BusPacket* packet, PIMCmd cCmd, int pimblock_id)
             rank->banks[pimblock_id * 2 + 1].write(packet);  // basically read from bank.
         }
     }
+    // else if (cCmd.type_ == PIMCmdType::PART)
+    // {
+    //     BurstType dstBst;
+    //     BurstType srcBst;
+
+    //     unsigned int bit_len = cCmd.;
+    //     unsigned int bit_pos = 0;
+
+    //     pimBlocks[pimblock_id].hash(dstBst, srcBst, bit_len, pit_pos);
+        
+    //     for (int i = 0; i < 4; i++)
+    //     {
+    //         writeOpd(dstBst.u32Data_[i] , srcBst, cCmd.dst_, packet, cCmd.dstIdx_, cCmd.isAuto_, false);
+    //     }
+        
+    // }
 }

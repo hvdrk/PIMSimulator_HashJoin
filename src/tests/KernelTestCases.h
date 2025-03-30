@@ -156,10 +156,21 @@ class PIMKernelFixture : public testing::Test
                                  0);
                 break;
             }
-            // case KernelType::JOIN:
-            // {
-
-            // }
+            case KernelType::JOIN:
+            {
+                int input_row0 = 0;
+                int input_row1 = 16384/2; // NUM_ROWS / 2
+                // int result_row = 256;
+                kernel->preloadNoReplacement(&dim_data->input_npbst_, input_row0, 0);
+                kernel->preloadNoReplacement(&dim_data->input1_npbst_, input_row1, 0);
+                kernel->executeFirstPartition(dim_data->dimTobShape(dim_data->output_dim_),
+                                       pimBankType::ALL_BANK, kn_type, input_row0, result_row,
+                                       input_row1);
+                // result = new BurstType[dim_data->output_dim_];
+                // kernel->readData(result, dim_data->dimTobShape(dim_data->output_dim_), result_row,
+                //                  0);
+                break;
+            }
             case KernelType::GEMVTREE:
             default:
             {

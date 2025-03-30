@@ -40,10 +40,25 @@ class PIMBlock
     BurstType mOut;
     BurstType aOut;
 
+    // BurstType SRAM[];
+
+    // for part. total is 16384(16K) = 16 * 64 + 16 * 960
+    BurstType sramA[16][64];
+    BurstType sramB[16][960];
+
+    //for join.
+    BurstType sram[16384];
+
+
+    //
+
     void add(BurstType& dstBst, BurstType& src0Bst, BurstType& src1Bst);
     void mac(BurstType& dstBst, BurstType& src0Bst, BurstType& src1Bst);
     void mul(BurstType& dstBst, BurstType& src0Bst, BurstType& src1Bst);
     void mad(BurstType& dstBst, BurstType& src0Bst, BurstType& src1Bst, BurstType& src2Bst);
+
+    /////////////////////////////////////////////
+    void hash(BurstType& dstBst, BurstType& src0Bst, unsigned int bit_len, unsigned int bit_pos);  // n : 임시. 몇차파티션인지
 
     std::string print();
 

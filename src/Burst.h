@@ -28,8 +28,8 @@ using namespace std;
 
 // struct TUPLE
 struct Tuple {
-    uint64_t key;
-    uint64_t value;
+    uint32_t key;
+    uint32_t value;
 };
 
 namespace DRAMSim
@@ -84,10 +84,10 @@ union BurstType
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////
     // new BurstType
-    // Tuple, uint64
-    BurstType(Tuple x0, Tuple x1)
+    // Tuple, uint32
+    BurstType(Tuple x0, Tuple x1, Tuple x2, Tuple x3)
     {
-        set(x0, x1);
+        set(x0, x1, x2, x3);
     }
 
     BurstType(uint64_t x)
@@ -95,10 +95,12 @@ union BurstType
         set(x);
     }
 
-    void set(Tuple x0, Tuple x1)
+    void set(Tuple x0, Tuple x1, Tuple x2, Tuple x3)
     {
-        u64Tuple_[0] = x0;
-        u64Tuple_[1] = x1;
+        TupleData_[0] = x0;
+        TupleData_[1] = x1;
+        TupleData_[2] = x2;
+        TupleData_[3] = x3;
     }
 
     void set(uint64_t x)
@@ -395,7 +397,7 @@ union BurstType
     uint64_t u64Data_[4];   //uint64    ////////////////////////////////////////////////////////////////
     uint32_t u32Data_[8];
     uint16_t u16Data_[16];
-    Tuple u64Tuple_[2]; //TUPLE ////////////////////////////////////////////////////////////////////////
+    Tuple TupleData_[4]; //TUPLE ////////////////////////////////////////////////////////////////////////
 };
 
 
@@ -405,6 +407,9 @@ union BurstType
 struct NumpyBurstType
 {
     vector<unsigned long> shape;
+    // vector<unsigned long> u32Data;
+    // vector<Tuple> TupleData;
+    vector<uint32_t> u32Data;
     vector<unsigned long long> u64Data;
     vector<float> data;
     vector<uint16_t> u16Data;
@@ -440,21 +445,32 @@ struct NumpyBurstType
     // Load Tuple
     void loadTuple(string filename)
     {
-        npy::LoadArrayFromNumpy(filename, shape, u64Data);
+        npy::LoadArrayFromNumpy(filename, shape, u32Data);
 
-        bShape.push_back(shape[0]/2);
+        std::cout << "shape is " << shape[0] << ", " << shape[1] << std::endl;
 
-        for (size_t i = 0; i < u64Data.size(); i += 4)
+        bShape.push_back(shape[0]/4);
+
+        std::cout << "u32Data.size() is " << u32Data.size() << std::endl;
+
+
+        for (size_t i = 0; i < u32Data.size(); i += 8)
         {
-            Tuple t0, t1;
+            Tuple t0, t1, t2, t3;
 
-            t0.key = u64Data[i];
-            t0.value = u64Data[i + 1];
+            t0.key = u32Data[i];
+            t0.value = u32Data[i + 1];
 
-            t1.key = u64Data[i + 2];
-            t1.value = u64Data[i + 3];
+            t1.key = u32Data[i + 2];
+            t1.value = u32Data[i + 3];
 
-            BurstType burst(t0, t1);
+            t2.key = u32Data[i + 4];
+            t2.value = u32Data[i + 5];
+
+            t3.key = u32Data[i + 6];
+            t3.value = u32Data[i + 7];
+
+            BurstType burst(t0, t1, t2, t3);
             bData.push_back(burst);
         }
     }
@@ -467,6 +483,18 @@ struct NumpyBurstType
         for (int i = 0; i < u64Data.size(); i += 4)
         {
             BurstType burst(u64Data[i], u64Data[i + 1], u64Data[i + 2], u64Data[i + 3]);
+            bData.push_back(burst);
+        }
+    }
+
+    void loadInt32(string filename)
+    {
+        npy::LoadArrayFromNumpy(filename, shape, u32Data);
+        loadTobShape((double)8);
+        for (int i = 0; i < u32Data.size(); i += 8)
+        {
+            BurstType burst(u32Data[i], u32Data[i + 1], u32Data[i + 2], u32Data[i + 3], u32Data[i + 4],
+                            u32Data[i + 5], u32Data[i + 6], u32Data[i + 7]);
             bData.push_back(burst);
         }
     }
@@ -567,6 +595,7 @@ struct NumpyBurstType
         {
             dim *= bShape[i];
         }
+        // std::cout << "total dim is " << dim << std::endl;
         return dim;
     }
 };

@@ -56,14 +56,14 @@ class PIMAddrManager
         num_bank_bits_ = uLog2(num_banks_) - uLog2(num_bank_groups_);
         num_row_bits_ = uLog2(num_rows_);
         num_chan_bits_ = uLog2(num_chans_);
-        num_col_bits_ = uLog2(num_cols_ / getConfigParam(UINT, "BL"));
+        num_col_bits_ = uLog2(num_cols_ / getConfigParam(UINT, "BL"));  // this actually means number of burst per row. 128/4=32
         num_rank_bits_ = uLog2(num_ranks_);
         num_offset_bits_ =
-            uLog2(getConfigParam(UINT, "BL") * getConfigParam(UINT, "JEDEC_DATA_BUS_BITS") / 8);
+            uLog2(getConfigParam(UINT, "BL") * getConfigParam(UINT, "JEDEC_DATA_BUS_BITS") / 8);    //5
 
         num_col_low_bits_ = 2;
         num_col_high_bits_ = num_col_bits_ - num_col_low_bits_;
-        num_cols_per_bl_ = num_cols_ / getConfigParam(UINT, "BL");
+        num_cols_per_bl_ = num_cols_ / getConfigParam(UINT, "BL");  // this actually means number of burst per row. 128/4=32
 
         address_mapping_scheme_ = PIMConfiguration::getAddressMappingScheme();
     }

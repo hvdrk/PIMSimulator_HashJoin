@@ -370,6 +370,10 @@ void Rank::writeSb(BusPacket* packet)
 #ifndef NO_STORAGE
     if (!(packet->row == config.PIM_REG_RA) && !pimRank->isReservedRA(packet->row))
         banks[packet->bank].write(packet);
+    // if (packet->bank == 4 && packet->row == 0 && packet->column == 0)
+    // {
+    //     std::cout << "bank " << packet->bank << std::endl;
+    // }
 #endif
 }
 
