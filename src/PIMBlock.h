@@ -31,8 +31,12 @@ class PIMBlock
     PIMBlock()
     {
         pimPrecision_ = PIMConfiguration::getPIMPrecision();
+        // part1_dst_row_idx = 
+        std::fill(std::begin(idx_flag), std::end(idx_flag), false);
     }
-    PIMBlock(const PIMPrecision& pimPrecision) : pimPrecision_(pimPrecision) {}
+    PIMBlock(const PIMPrecision& pimPrecision) : pimPrecision_(pimPrecision) {
+      std::fill(std::begin(idx_flag), std::end(idx_flag), false);
+    }
 
     BurstType srf;
     BurstType grfA[8];  // FIXME: hard coding shcha
@@ -42,12 +46,17 @@ class PIMBlock
 
     // BurstType SRAM[];
 
-    // for part. total is 16384(16K) = 16 * 64 + 16 * 960
-    BurstType sramA[16][64];
-    BurstType sramB[16][960];
+    // // for part. total is 16384(16K) = 16 * 64 + 16 * 960
+    // BurstType sramA[16][64];
+    // BurstType sramB[16][960];
 
-    //for join.
-    BurstType sram[16384];
+    // //for join.
+    // BurstType sram[16384];
+    Tuple sram[16][256];
+    bool idx_flag[16];
+
+    uint8_t sram_idx[16];
+    // int part1_dst_row_idx;
 
 
     //

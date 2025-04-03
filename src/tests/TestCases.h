@@ -43,11 +43,14 @@ class MemBandwidthFixture : public testing::Test
     virtual void SetUp()
     {
         cur_cycle = 0;
+        // mem = make_shared<MultiChannelMemorySystem>("ini/HBM2_samsung_2M_16B_x64.ini",
+        //                                             "system_hbm_64ch.ini", ".", "example_app", 256 * 16);
         mem = make_shared<MultiChannelMemorySystem>("ini/HBM2_samsung_2M_16B_x64.ini",
-                                                    "system_hbm_1ch.ini", ".", "example_app", 256 * 16);
+                                                    "system_hbm_64ch.ini", ".", "example_app", 256 * 16);
         mem_size = (uint64_t)getConfigParam(UINT, "NUM_CHANS") * getConfigParam(UINT, "NUM_RANKS") *
                    getConfigParam(UINT, "NUM_BANK_GROUPS") * getConfigParam(UINT, "NUM_BANKS") *
                    getConfigParam(UINT, "NUM_ROWS") * getConfigParam(UINT, "NUM_COLS");
+        std::cout << "NUM_BANKS" << getConfigParam(UINT, "NUM_BANKS") << std::endl;
         basic_stride =
             (getConfigParam(UINT, "JEDEC_DATA_BUS_BITS") * getConfigParam(UINT, "BL") / 8);
     }

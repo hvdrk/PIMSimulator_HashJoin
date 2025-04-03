@@ -66,6 +66,7 @@ class PIMRank : public SimulatorObject
     int pimPC_, lastJumpIdx_, numJumpToBeTaken_, lastRepeatIdx_, numRepeatToBeDone_;
     bool pimOpMode_, toggleEvenBank_, toggleOddBank_, toggleRa13h_, crfExit_;
 
+    int DstInitialRow;
   public:
     PIMRank(ostream& simLog, Configuration& configuration);
     ~PIMRank() {}

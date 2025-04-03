@@ -30,7 +30,7 @@ enum class PIMCmdType   // total 16 -> 4 bits
     MAC,
     MAD,
     PART,   
-    REV1,   // dummy
+    STB1,
     REV2,   // dummy
     MOV,
     FILL,

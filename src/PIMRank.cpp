@@ -271,6 +271,8 @@ void PIMRank::readOpd(int pb, BurstType& bst, PIMOpdType type, BusPacket* packet
         case PIMOpdType::SRAM:
             return;
         case PIMOpdType::BANK:
+            rank->banks[pb].read(packet);  // basically read from bank.
+            bst = *(packet->data);
             return;
     }
 }
@@ -336,7 +338,7 @@ void PIMRank::doPIM(BusPacket* packet)
     packet->row = masked2accessibleRA(packet->row);
     do
     {
-        
+        // std::cout << "pimPC_ is " << pimPC_ << std::endl;
         cCmd.fromInt(crf.data[pimPC_]);
         // if (cCmd.toStr() != "NOP 8x") {
         //     std::cout << "num = " << num++ << std::endl;
@@ -434,13 +436,51 @@ void PIMRank::doPIM(BusPacket* packet)
         // EXIT check
         PIMCmd next_cmd;
         next_cmd.fromInt(crf.data[pimPC_]);
+
+        
         if (next_cmd.type_ == PIMCmdType::EXIT)
             crfExit_ = true;
     } while (cCmd.type_ == PIMCmdType::JUMP);
 }
 
+static int q=0;
+static int counter=0;
+
 void PIMRank::doPIMBlock(BusPacket* packet, PIMCmd cCmd, int pimblock_id)
 {
+    if (pimblock_id == 0) {
+        if (q==0 && cCmd.type_ == PIMCmdType::FILL) {
+            std::cout << "cmd is " << cCmd.cmdToStr(cCmd.type_) << std::endl;
+            q++;
+        }
+        else if (q==1 && cCmd.type_ == PIMCmdType::ADD) {
+            std::cout << "prev counter is " << counter << std::endl;
+            std::cout << "cmd is " << cCmd.cmdToStr(cCmd.type_) << std::endl;
+            q++;
+        }
+        else if (q==2 && cCmd.type_ == PIMCmdType::NOP) {
+            std::cout << "prev counter is " << counter << std::endl;
+            std::cout << "cmd is " << cCmd.cmdToStr(cCmd.type_) << std::endl;
+            q++;
+        }
+        else if (q==3 && cCmd.type_ == PIMCmdType::FILL) {
+            std::cout << "prev counter is " << counter << std::endl;
+            std::cout << "cmd is " << cCmd.cmdToStr(cCmd.type_) << std::endl;
+            q++;
+        }
+        else if (q==4 && cCmd.type_ == PIMCmdType::ADD) {
+            std::cout << "prev counter is " << counter << std::endl;
+            std::cout << "cmd is " << cCmd.cmdToStr(cCmd.type_) << std::endl;
+            q++;
+        }
+        else if (q==5 && cCmd.type_ == PIMCmdType::NOP) {
+            std::cout << "prev counter is " << counter << std::endl;
+            std::cout << "cmd is " << cCmd.cmdToStr(cCmd.type_) << std::endl;
+            q++;
+        }
+        counter++;
+    }
+    
     if (cCmd.type_ == PIMCmdType::FILL || cCmd.type_ == PIMCmdType::MOV)
     {
         BurstType bst;
@@ -513,18 +553,58 @@ void PIMRank::doPIMBlock(BusPacket* packet, PIMCmd cCmd, int pimblock_id)
     }
     else if (cCmd.type_ == PIMCmdType::PART)
     {
-        BurstType dstBst;
-        BurstType srcBst;
+        BurstType src0Bst;
 
-        // unsigned int bit_len = cCmd.;
-        // unsigned int bit_pos = 0;
+        readOpd(pimblock_id, src0Bst, cCmd.src0_, packet, cCmd.src0Idx_, cCmd.isAuto_, false);
 
-        // pimBlocks[pimblock_id].hash(dstBst, srcBst, bit_len, pit_pos);
+        int partition_num[4];
+        int partition_round;
+        for (int i=0; i<4; i++) {
+            partition_num[i] = ((src0Bst.TupleData_[i].key >> (partition_round * 4)) & 15);
+        }
+
+        for (int i=0; i<4; i++) {
+            unsigned int dest_idx = pimBlocks[pimblock_id].sram_idx[partition_num[i]];
+            if (dest_idx == 127 || dest_idx == 255) {
+                idx_flag[partition_num[i]] = true;
+            }
+            // if (dest_idx == 255) {
+            //     pimBlocks[pimblock_id].sram_idx[partition_num[i]] = 0;
+            // }
+            // else {
+            //     ++pimBlocks[pimblock_id].sram_idx[partition_num[i]];
+            // }
+            ++pimBlocks[pimblock_id].sram_idx[partition_num[i]];
+            
+            pimBlocks[pimblock_id].sram[partition_num[i]][dest_idx] = src0Bst.TupleData_[i];
+        }
+    }
+    else if (cCmd.type_ == PIMCmdType::STB1)
+    {
+        //from transaction or numRepeatToBeDone_
+        int dst_bank;
+        int dst_col;
+        int src_bnk;
+        // int dst_bnk = 15 - numRepeatToBeDone_ & 15;
+        // int dst_col = 127 - (numRepeatToBeDone_ >> 4) & 127;
+        // int src_bnk = 15 - (numRepeatToBeDone_ >> 11) & 15;
+
+        //from pimblock
+        int dst_row;    
+
         
-        // for (int i = 0; i < 4; i++)
-        // {
-        //     writeOpd(dstBst.u32Data_[i] , srcBst, cCmd.dst_, packet, cCmd.dstIdx_, cCmd.isAuto_, false);
-        // }
-        
+        if (pimblock_id == src_bnk) {
+            if (pimBlocks[src_bnk].idx_flag[dst_bnk] == true) {
+                BurstType bst;
+                for (int i=0; i<4; i++) {
+                    bst.TupleData_[i] = pimBlocks[src_bnk].sram[dst_bank][dst_col*4+i];
+                } 
+                packet->row = dst_row;
+                writeOpd(dst_bank, dstBst, cCmd.dst_, packet, cCmd.dstIdx_, cCmd.isAuto_, false);
+            }
+    
+
+        }
+
     }
 }

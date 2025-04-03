@@ -382,9 +382,13 @@ void MultiChannelMemorySystem::update()
 {
     clockDomainCrosser.update();
 }
-
+// static int i = 0;
 void MultiChannelMemorySystem::actual_update()
 {
+    // if (i==0){
+    //     std::cout << "total ch num is " << channels.size() << std::endl;
+    //     i++;
+    // }
     if (currentClockCycle == 0)
     {
         InitOutputFiles(traceFilename);
