@@ -551,60 +551,60 @@ void PIMRank::doPIMBlock(BusPacket* packet, PIMCmd cCmd, int pimblock_id)
             rank->banks[pimblock_id * 2 + 1].write(packet);  // basically read from bank.
         }
     }
-    else if (cCmd.type_ == PIMCmdType::PART)
-    {
-        BurstType src0Bst;
+    // else if (cCmd.type_ == PIMCmdType::PART)
+    // {
+    //     BurstType src0Bst;
 
-        readOpd(pimblock_id, src0Bst, cCmd.src0_, packet, cCmd.src0Idx_, cCmd.isAuto_, false);
+    //     readOpd(pimblock_id, src0Bst, cCmd.src0_, packet, cCmd.src0Idx_, cCmd.isAuto_, false);
 
-        int partition_num[4];
-        int partition_round;
-        for (int i=0; i<4; i++) {
-            partition_num[i] = ((src0Bst.TupleData_[i].key >> (partition_round * 4)) & 15);
-        }
+    //     int partition_num[4];
+    //     int partition_round;
+    //     for (int i=0; i<4; i++) {
+    //         partition_num[i] = ((src0Bst.TupleData_[i].key >> (partition_round * 4)) & 15);
+    //     }
 
-        for (int i=0; i<4; i++) {
-            unsigned int dest_idx = pimBlocks[pimblock_id].sram_idx[partition_num[i]];
-            if (dest_idx == 127 || dest_idx == 255) {
-                idx_flag[partition_num[i]] = true;
-            }
-            // if (dest_idx == 255) {
-            //     pimBlocks[pimblock_id].sram_idx[partition_num[i]] = 0;
-            // }
-            // else {
-            //     ++pimBlocks[pimblock_id].sram_idx[partition_num[i]];
-            // }
-            ++pimBlocks[pimblock_id].sram_idx[partition_num[i]];
+    //     for (int i=0; i<4; i++) {
+    //         unsigned int dest_idx = pimBlocks[pimblock_id].sram_idx[partition_num[i]];
+    //         if (dest_idx == 127 || dest_idx == 255) {
+    //             idx_flag[partition_num[i]] = true;
+    //         }
+    //         // if (dest_idx == 255) {
+    //         //     pimBlocks[pimblock_id].sram_idx[partition_num[i]] = 0;
+    //         // }
+    //         // else {
+    //         //     ++pimBlocks[pimblock_id].sram_idx[partition_num[i]];
+    //         // }
+    //         ++pimBlocks[pimblock_id].sram_idx[partition_num[i]];
             
-            pimBlocks[pimblock_id].sram[partition_num[i]][dest_idx] = src0Bst.TupleData_[i];
-        }
-    }
-    else if (cCmd.type_ == PIMCmdType::STB1)
-    {
-        //from transaction or numRepeatToBeDone_
-        int dst_bank;
-        int dst_col;
-        int src_bnk;
-        // int dst_bnk = 15 - numRepeatToBeDone_ & 15;
-        // int dst_col = 127 - (numRepeatToBeDone_ >> 4) & 127;
-        // int src_bnk = 15 - (numRepeatToBeDone_ >> 11) & 15;
+    //         pimBlocks[pimblock_id].sram[partition_num[i]][dest_idx] = src0Bst.TupleData_[i];
+    //     }
+    // }
+    // else if (cCmd.type_ == PIMCmdType::STB1)
+    // {
+    //     //from transaction or numRepeatToBeDone_
+    //     int dst_bank;
+    //     int dst_col;
+    //     int src_bnk;
+    //     // int dst_bnk = 15 - numRepeatToBeDone_ & 15;
+    //     // int dst_col = 127 - (numRepeatToBeDone_ >> 4) & 127;
+    //     // int src_bnk = 15 - (numRepeatToBeDone_ >> 11) & 15;
 
-        //from pimblock
-        int dst_row;    
+    //     //from pimblock
+    //     int dst_row;    
 
         
-        if (pimblock_id == src_bnk) {
-            if (pimBlocks[src_bnk].idx_flag[dst_bnk] == true) {
-                BurstType bst;
-                for (int i=0; i<4; i++) {
-                    bst.TupleData_[i] = pimBlocks[src_bnk].sram[dst_bank][dst_col*4+i];
-                } 
-                packet->row = dst_row;
-                writeOpd(dst_bank, dstBst, cCmd.dst_, packet, cCmd.dstIdx_, cCmd.isAuto_, false);
-            }
+    //     if (pimblock_id == src_bnk) {
+    //         if (pimBlocks[src_bnk].idx_flag[dst_bnk] == true) {
+    //             BurstType bst;
+    //             for (int i=0; i<4; i++) {
+    //                 bst.TupleData_[i] = pimBlocks[src_bnk].sram[dst_bank][dst_col*4+i];
+    //             } 
+    //             packet->row = dst_row;
+    //             writeOpd(dst_bank, dstBst, cCmd.dst_, packet, cCmd.dstIdx_, cCmd.isAuto_, false);
+    //         }
     
 
-        }
+    //     }
 
-    }
+    // }
 }
