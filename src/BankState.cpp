@@ -99,3 +99,28 @@ void BankState::showState()
         PRINTN("[lowp] ");
     }
 }
+
+void BankState::out()
+{
+    if (currentBankState == Idle)
+    {
+        std::cout << "I, ";
+    }
+    else if (currentBankState == RowActive)
+    {
+        std::cout << "A, ";
+    }
+    else if (currentBankState == Refreshing)
+    {
+        std::cout << "R, ";
+    }
+    else if (currentBankState == PowerDown)
+    {
+        std::cout << "D, ";
+    }
+    else if (currentBankState == Precharging)
+    {
+        std::cout << "P, ";
+    }
+
+}

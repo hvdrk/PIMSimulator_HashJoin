@@ -76,6 +76,35 @@ class EltwisePIMKernel : public IPIMCmd
     }
 };
 
+class JoinPIMKernel : public IPIMCmd
+{
+  public:
+  JoinPIMKernel(KernelType ktype) : IPIMCmd(ktype) {}
+    virtual vector<PIMCmd> generateKernel(int num_jump_to_be_taken,
+                                          int num_jump_to_be_taken_odd_bank = 0,
+                                          int num_jump_to_be_taken_even_bank = 0) override
+    {
+        vector<PIMCmd> pim_cmds;
+        vector<PIMCmd> tmp_cmds{
+            // PIMCmd(PIMCmdType::PART, 32 - 1, PIMOpdType::SRAM, PIMOpdType::BANK, 0),
+            // PIMCmd(PIMCmdType::STB1, 16*16*32 - 1, PIMOpdType::SRAM, PIMOpdType::BANK, 0)
+            PIMCmd(1, PIMCmdType::PART, PIMOpdType::SRAM, PIMOpdType::BANK, 0),
+            PIMCmd(1, PIMCmdType::STB1, PIMOpdType::SRAM, PIMOpdType::BANK, 0)
+        };
+
+
+        pim_cmds.assign(tmp_cmds.begin(), tmp_cmds.end());
+        if (num_jump_to_be_taken != 0)
+        {
+            pim_cmds.push_back(PIMCmd(PIMCmdType::JUMP, num_jump_to_be_taken, pim_cmds.size() + 1));
+        }
+        pim_cmds.push_back(PIMCmd(PIMCmdType::EXIT, 0));
+        // std::cout << "l is " << l++ << std::endl;
+        return pim_cmds;
+    }
+
+};
+
 class ActPIMKernel : public IPIMCmd
 {
   public:
@@ -159,6 +188,7 @@ class GemvPIMKernel : public IPIMCmd
         return pim_cmds;
     }
 };
+
 
 class PIMCmdGen
 {

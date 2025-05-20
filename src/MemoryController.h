@@ -72,9 +72,14 @@ class MemoryController : public SimulatorObject
     // fields
     vector<Transaction*> transactionQueue;
 
+    CommandQueue commandQueue;
+    vector<Transaction*> pendingReadTransactions;
+    vector<vector<BankState>> bankStates;
+
+
   private:
     ostream& dramsimLog;
-    vector<vector<BankState>> bankStates;
+    // vector<vector<BankState>> bankStates;
 
     // functions
     void insertHistogram(unsigned latencyValue, unsigned rank, unsigned bank);
@@ -89,12 +94,12 @@ class MemoryController : public SimulatorObject
     // fields
     MemorySystem* parentMemorySystem;
 
-    CommandQueue commandQueue;
+    // CommandQueue commandQueue;
     BusPacket* poppedBusPacket;
     vector<BusPacket*> writeDataToSend;
     vector<unsigned> writeDataCountdown;
     vector<Transaction*> returnTransaction;
-    vector<Transaction*> pendingReadTransactions;
+    // vector<Transaction*> pendingReadTransactions;
     map<unsigned, unsigned> latencies;  // latencyValue -> latencyCount
     vector<bool> powerDown;
     vector<Rank*>* ranks;

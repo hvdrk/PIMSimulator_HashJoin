@@ -40,6 +40,8 @@ class PIMAddrManager
                      unsigned col);
     uint64_t addrGenSafe(unsigned chan, unsigned rank, unsigned bankgroup, unsigned bank,
                          unsigned& row, unsigned& col);
+    uint64_t addrGenSafe1(unsigned chan, unsigned rank, unsigned bankgroup, unsigned bank,
+                         unsigned row, unsigned col);
     unsigned maskByBit(unsigned value, int startingBit, int endBit);
 
     PIMAddrManager(int num_pim_chans, int num_pim_ranks)
@@ -49,7 +51,7 @@ class PIMAddrManager
         num_ranks_ = getConfigParam(UINT, "NUM_RANKS");
         num_bank_groups_ = getConfigParam(UINT, "NUM_BANK_GROUPS");
         num_banks_ = getConfigParam(UINT, "NUM_BANKS");
-        num_rows_ = getConfigParam(UINT, "NUM_ROWS");
+        num_rows_ = getConfigParam(UINT, "NUM_ROWS");   //16384 -> 16K, 14bits
         num_cols_ = getConfigParam(UINT, "NUM_COLS");
 
         num_bankgroup_bits_ = uLog2(num_bank_groups_);

@@ -115,6 +115,8 @@ class PIMRank : public SimulatorObject
         return (row & ((1 << 13) - 1));
     }
 
+    bool getexit() { return crfExit_; }
+
     Rank* rank;
     vector<PIMBlock> pimBlocks;
 };

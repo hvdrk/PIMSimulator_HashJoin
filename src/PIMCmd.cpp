@@ -64,6 +64,21 @@ void PIMCmd::fromInt(uint32_t val)
             src0Idx_ = fromBit(val, 4, 4);
             src1Idx_ = fromBit(val, 4, 0);
             break;
+        case PIMCmdType::PART:
+            dst_ = PIMOpdType(fromBit(val, 3, 25));
+            src0_ = PIMOpdType(fromBit(val, 3, 22));
+            round_ = fromBit(val, 3, 19);
+            isAuto_ = fromBit(val, 1, 18);
+        case PIMCmdType::STB1:
+        case PIMCmdType::STB1R:
+        case PIMCmdType::STS:
+            dst_ = PIMOpdType(fromBit(val, 3, 25));
+            src0_ = PIMOpdType(fromBit(val, 3, 22));
+            round_ = fromBit(val, 3, 19);
+            isAuto_ = fromBit(val, 1, 18);
+            dstIdx_ = fromBit(val, 4, 14);
+            src0Idx_ = fromBit(val, 4, 10);
+            src1Idx_ = fromBit(val, 8, 2);
 
         default:
             break;
@@ -137,6 +152,25 @@ uint32_t PIMCmd::toInt() const
             val |= toBit(dstIdx_, 4, 8);
             val |= toBit(src0Idx_, 4, 4);
             val |= toBit(src1Idx_, 4, 0);
+            break;
+        
+        case PIMCmdType::PART:
+            val |= toBit(int(dst_), 3, 25);
+            val |= toBit(int(src0_), 3, 22);
+            val |= toBit(round_, 3, 19);
+            val |= toBit(isAuto_, 1, 18);
+            // val |= toBit(loopCounter_, 6, 0);
+        case PIMCmdType::STB1:
+        case PIMCmdType::STB1R:
+        case PIMCmdType::STS:
+            val |= toBit(int(dst_), 3, 25);
+            val |= toBit(int(src0_), 3, 22);
+            val |= toBit(round_, 3, 19);
+            val |= toBit(isAuto_, 1, 18);
+            val |= toBit(dstIdx_, 4, 14);
+            val |= toBit(src0Idx_, 4, 10);
+            val |= toBit(src1Idx_, 8, 2);
+            // val |= toBit(loopCounter_, 14, 0);
             break;
 
         default:

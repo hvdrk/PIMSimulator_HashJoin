@@ -26,6 +26,9 @@ uint64_t PIMAddrManager::addrGen(unsigned chan, unsigned rank, unsigned bankgrou
                                  unsigned row, unsigned col)
 {
     uint64_t addr = 0;
+    // if (row >= num_rows_/2) {
+    //     std::cout << "num_rows_ : " << num_rows_ << ", row : " << row << std::endl;
+    // }
     if (address_mapping_scheme_ == Scheme8)
     {
         addr = rank;
@@ -69,3 +72,23 @@ uint64_t PIMAddrManager::addrGenSafe(unsigned chan, unsigned rank, unsigned bank
     }
     return addrGen(chan, rank, bankgroup, bank, row, col);
 }
+
+uint64_t PIMAddrManager::addrGenSafe1(unsigned chan, unsigned rank, unsigned bankgroup,
+    unsigned bank, unsigned row, unsigned col)
+{
+unsigned new_col = col;
+unsigned new_row = row;
+while (new_col >= num_cols_per_bl_)
+{
+std::cout << "too much col" << std::endl;
+new_row++;
+new_col -= (num_cols_per_bl_);
+}
+
+if (new_row >= num_rows_)
+{
+cerr << "row overflow" << endl;
+}
+return addrGen(chan, rank, bankgroup, bank, new_row, new_col);
+}
+

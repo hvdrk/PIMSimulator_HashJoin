@@ -140,6 +140,7 @@ void CommandQueue::enqueue(BusPacket* newBusPacket)
         queues[rank][0].push_back(newBusPacket);
         if (queues[rank][0].size() > cmd_queue_depth_)
         {
+            // std::cout << "== Error - Enqueued more than allowed in command queue" << std::endl;
             ERROR("== Error - Enqueued more than allowed in command queue");
             ERROR(
                 "                        Need to call .hasRoomFor(int numberToEnqueue, "
@@ -267,6 +268,7 @@ bool CommandQueue::process_command(BusPacket** busPacket)
                                   packet->rank, packet->bank, nullptr, dramsimLog, packet->tag);
                 if (isIssuable(*busPacket))
                 {
+                    // std::cout << "busPacket->bank is " << (*busPacket)->bank << std::endl;
                     return true;
                 }
                 else

@@ -375,26 +375,60 @@ void Rank::writeSb(BusPacket* packet)
 
 void Rank::sendToBank(BusPacket* packet)
 {
+    // std::cout<<"sendToBank"<<std::endl;
+    
     switch (packet->busPacketType)
     {
         case READ:
+        // std::cout<<"case READ, row is "<< packet->row <<std::endl;
             if (mode_ == dramMode::SB)
                 readSb(packet);
             else if (mode_ == dramMode::HAB_PIM && pimRank->isToggleCond(packet))
-                pimRank->doPIM(packet);
+                {
+                    // std::cout<<"dopim read"<<std::endl; 
+                    pimRank->doPIM(packet);
+                }
             else
-                pimRank->readHab(packet);
+                {
+                    pimRank->readHab(packet);
+                    // std::cout<<"HAB"<<std::endl; 
+                }
             packet->busPacketType = DATA;
             readReturnPacket.push_back(packet);
             readReturnCountdown.push_back(config.RL);
             break;
         case WRITE:
-            if (mode_ == dramMode::SB)
+            // if (packet->row >= 16384 / 2)
+            //     {
+            //         std::cout << "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ packet->row is " << packet->row << "mode is ";
+            //         if (mode_ == dramMode::SB)
+            //             std::cout << "SB" << std::endl;
+            //         else if (mode_ == dramMode::HAB_PIM)
+            //             std::cout << "HAB_PIM" << std::endl;
+            //         else
+            //             std::cout << "HAB" << std::endl;
+            //     }
+            
+            // std::cout<<"case WRITE, row is " << packet->row <<std::endl;
+            if (mode_ == dramMode::SB) {
                 writeSb(packet);
+                // std::cout<<"SB"<<std::endl;
+                }
             else if (mode_ == dramMode::HAB_PIM && pimRank->isToggleCond(packet))
-                pimRank->doPIM(packet);
+            // else if (mode_ == dramMode::HAB_PIM)
+            // else if (mode_ == dramMode::HAB_PIM && !pimRank->getexit())
+                {
+                    // std::cout<<"dopim write"<<std::endl; 
+                    pimRank->doPIM(packet);
+                }
+            // else if (mode_ == dramMode::HAB_PIM) {
+            //     std::cout<<"only pim mode"<<std::endl;
+            //     // std::cout << pimRank->pimOpMode_ << ", " << pimRank->crfExit_ << ", " << pimRank->toggleRa13h_ << ", "  << std::endl;
+            // }
             else
-                pimRank->writeHab(packet);
+                {pimRank->writeHab(packet);
+                // std::cout<<"HAB"<<std::endl; 
+                }
             delete (packet);
             break;
         case ACTIVATE:

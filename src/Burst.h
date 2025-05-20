@@ -42,6 +42,10 @@ union BurstType
         {
             fp16Data_[i] = convertF2H(0.0f);
         }
+        for (int i=0; i<4; i++)
+        {
+            TupleData_[i] = {0, 0};
+        }
     }
     BurstType(float* x)
     {

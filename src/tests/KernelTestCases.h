@@ -136,8 +136,10 @@ class PIMKernelFixture : public testing::Test
             case KernelType::MUL:
             {
                 int input_row0 = 0;
-                int input_row1 = 128;
-                int result_row = 256;
+                // int input_row1 = 128;
+                // int result_row = 256;
+                int input_row1 = 16384/4;
+                int result_row = 16384/2;
                 kernel->preloadNoReplacement(&dim_data->input_npbst_, input_row0, 0);
                 kernel->preloadNoReplacement(&dim_data->input1_npbst_, input_row1, 0);
                 kernel->executeEltwise(dim_data->dimTobShape(dim_data->output_dim_),
@@ -168,6 +170,13 @@ class PIMKernelFixture : public testing::Test
                 int input_row1 = 16384/4; // NUM_ROWS / 4 -> middle of DRAM seg
                 kernel->preloadNoReplacement(&dim_data->input_npbst_, input_row0, 0);
                 kernel->preloadNoReplacement(&dim_data->input1_npbst_, input_row1, 0);
+
+                std::cout << "111" << std::endl;
+
+                kernel->executeFirstPartition(dim_data->input_npbst_.getTotalDim(), dim_data->input1_npbst_.getTotalDim(),
+                                              pimBankType::ALL_BANK, kn_type, input_row0, input_row1);
+                                            
+                std::cout << "@@@@" << std::endl;
                 
 
                 /////////////////////////////////////////////////

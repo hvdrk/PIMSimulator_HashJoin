@@ -31,10 +31,10 @@ enum class PIMCmdType   // total 16 -> 4 bits
     MAD,
     PART,   
     STB1,
-    REV2,   // dummy
+    STB1R,
     MOV,
     FILL,
-    REV3,   // dummy
+    STS,
     REV4,   // dummy
     REV5,   // dummy
     REV6,   // dummy
@@ -71,6 +71,7 @@ class PIMCmd
     int src0Idx_;
     int src1Idx_;
     int isRelu_;
+    int round_;
 
     PIMCmd()
         : type_(PIMCmdType::NOP),
@@ -119,7 +120,25 @@ class PIMCmd
     {
     }
 
-    //3     ex) PIMCmd(PIMCmdType::FILL, PIMOpdType::GRF_A, PIMOpdType::EVEN_BANK)
+    // PART, STB1, STS
+    PIMCmd(int is_auto, PIMCmdType type, PIMOpdType dst, PIMOpdType src0, int round = 0,
+           int dst_idx = 0, int src0_idx = 0, int src1_idx = 0)
+        : type_(type),
+          dst_(dst),
+          src0_(src0),
+          src1_(PIMOpdType::A_OUT),
+          src2_(PIMOpdType::A_OUT),
+          loopCounter_(0),
+          loopOffset_(0),
+          round_(round),
+          isAuto_(is_auto),
+          dstIdx_(dst_idx),
+          src0Idx_(src0_idx),
+          src1Idx_(src1_idx)          
+    {
+    }
+
+    //3     ex) FILL
     PIMCmd(PIMCmdType type, PIMOpdType dst, PIMOpdType src0, int is_auto = 0, int dst_idx = 0,
            int src0_idx = 0, int src1_idx = 0, int is_relu = 0)
         : type_(type),
@@ -234,6 +253,12 @@ class PIMCmd
                 return "MAC";
             case PIMCmdType::MAD:
                 return "MAD";
+            case PIMCmdType::PART:
+                return "PART";
+            case PIMCmdType::STB1:
+                return "STB1";
+            case PIMCmdType::STB1R:
+                return "STB1R";
             default:
                 return "NOT_DEFINED";
         }

@@ -168,6 +168,9 @@ void MemoryController::setBankStates(size_t rank, size_t bank, CurrentBankState 
 
 void MemoryController::updateCommandQueue(BusPacket* poppedBusPacket)
 {
+    // if (poppedBusPacket->row >= 16384/2) {
+    //     std::cout << "@@@@@poppedBusPacket->row : " << poppedBusPacket->row << std::endl;
+    // }
     if (poppedBusPacket->busPacketType == WRITE)
     {
         writeDataToSend.push_back(new BusPacket(
@@ -318,6 +321,9 @@ void MemoryController::updateTransactionQueue()
         // pass these in as references so they get set by the addressMapping function
         am.addressMapping(transaction->address, newTransactionChan, newTransactionRank,
                           newTransactionBank, newTransactionRow, newTransactionColumn);
+        // if (newTransactionRow >= 16384/2) {
+        //     std::cout << "newTransactionRow : " << newTransactionRow << std::endl;
+        // }
 
         // if we have room, break up the transaction into the appropriate commands
         // and add them to the command queue
@@ -350,6 +356,12 @@ void MemoryController::updateTransactionQueue()
             command->tag = transaction->tag;
             commandQueue.enqueue(command);
 
+            // std::cout << "transaction->tag : " << transaction->tag << std::endl;
+            // if ((bpType != READ) || (bpType != WRITE)) {
+            //     std::cout << "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@" << std::endl;
+            //     exit(-1);
+            // }
+
             // If we have a read, save the transaction so when the data comes back
             // in a bus packet, we can staple it back into a transaction and return it
             if (transaction->transactionType == DATA_READ)
@@ -365,6 +377,9 @@ void MemoryController::updateTransactionQueue()
              */
             break;
         }
+        // else {
+        //     std::cout << "== Warning - No room in command queue" << std::endl;
+        // }
         /*
         else // no room, do nothing this cycle
         {
@@ -474,6 +489,10 @@ void MemoryController::update()
     if (outgoingDataPacket != NULL)
     {
         dataCyclesLeft--;
+        // if (outgoingDataPacket->row >= 16384 / 2)
+        // {
+        //     std::cout << "outgoingDataPacket->row : " << outgoingDataPacket->row << std::endl;
+        // }
         if (dataCyclesLeft == 0)
         {
             // inform upper levels that a write is done
@@ -532,8 +551,12 @@ void MemoryController::update()
     // function returns true if there is something valid in poppedBusPacket
     if (commandQueue.pop(&poppedBusPacket))
     {
+        // std::cout << " pop????" << std::endl;
         updateCommandQueue(poppedBusPacket);
     }
+    // else {
+    //     std::cout << "poppedBusPacket is NULL" << std::endl;
+    // }
 
     updateTransactionQueue();
 

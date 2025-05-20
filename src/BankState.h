@@ -64,6 +64,9 @@ class BankState
     BankState(ostream& simLog);
     void print();
     void showState();
+
+    void out();
+
 };
 
 }  // namespace DRAMSim

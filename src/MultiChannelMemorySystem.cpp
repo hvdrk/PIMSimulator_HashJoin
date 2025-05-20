@@ -413,6 +413,29 @@ void MultiChannelMemorySystem::actual_update()
     }
 
     currentClockCycle++;
+
+    // if (currentClockCycle < 8730) {
+    //     std::cout << "currentClockCycle is " << currentClockCycle << std::endl;
+        // if (currentClockCycle > 0) {
+        //     std::cout << "transactionQueue.size() is " << channels[0]->memoryController->transactionQueue.size() << std::endl;
+        //     // std::cout << "pendingTransactions.size() is " << channels[0]->pendingTransactions.size() << std::endl;
+            
+        //     // std::cout << "commandQueue.size() is " << channels[0]->memoryController->commandQueue.getCommandQueue(0,0).size() << std::endl;
+        // }
+        // for (int l=0; l<16; l++){
+        //     channels[0]->memoryController->bankStates[0][l].out();
+        // }
+        // std::cout << std::endl;
+    // }
+    // else if (channels[0]->memoryController->commandQueue.getCommandQueue(0,0).size() != 64) {
+    //     std::cout << "commandQueue.size() is " << channels[0]->memoryController->commandQueue.getCommandQueue(0,0).size() << std::endl;
+    // }
+    // else { 
+    //     std::cout << "currentClockCycle is " << currentClockCycle << std::endl; 
+    //     std::cout << "commandQueue.size() is " << channels[0]->memoryController->commandQueue.getCommandQueue(0,0).size() << std::endl;
+    // }
+
+    
 }
 
 unsigned MultiChannelMemorySystem::findChannelNumber(uint64_t addr)

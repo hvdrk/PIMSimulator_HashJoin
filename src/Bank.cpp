@@ -82,9 +82,19 @@ void Bank::read(BusPacket* busPacket)
     shared_ptr<DataStruct> foundNode = NULL;
     if ((foundNode = Bank::searchForRow(busPacket->row, rowHeadNode)) == NULL)
     {
+        // std::cout << "not found" << std::endl;
+        // Add new node that all data is zero and return that
+        shared_ptr<DataStruct> newRowNode = make_shared<DataStruct>();
+        newRowNode->row = busPacket->row;
+        newRowNode->next = rowHeadNode;
+        rowEntries[busPacket->column] = newRowNode;
+
+        *(busPacket->data) = newRowNode->data;
+
     }
     else  // found it
-    {
+    {   
+        // std::cout << "found it" << std::endl;
         *(busPacket->data) = foundNode->data;
     }
 }
@@ -101,6 +111,7 @@ void Bank::write(const BusPacket* busPacket)
         ERROR("== Error - Bus Packet column " << busPacket->column << " out of bounds");
         exit(-1);
     }
+
 
     // head of the list we need to search
     shared_ptr<DataStruct> rowHeadNode = rowEntries[busPacket->column];

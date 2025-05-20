@@ -1,7 +1,10 @@
 import numpy as np
 
-inner_size = 64     # within data type range. uint64 : under 2^64. must 64 * n
-outer_size = 64
+# inner_size = 64     # within data type range. uint64 : under 2^64. must 64 * n
+# outer_size = 64
+
+inner_size = 128*16*16  #  (# of tuples per row) * (# of banks) * (# of rows - max:8k)
+outer_size = 128*16*16 
 
 # data_type = np.uint64
 data_type = np.uint32

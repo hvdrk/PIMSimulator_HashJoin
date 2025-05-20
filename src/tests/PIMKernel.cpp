@@ -85,9 +85,12 @@ void PIMKernel::parkOut()
     addBarrier();
 }
 
+
+
 void PIMKernel::addTransactionAll(bool is_write, int bg_idx, int bank_idx, int row, int col,
                                   const string tag, BurstType* bst, bool use_barrier, int num_loop)
 {
+
     for (int& ch_idx : pim_chans_)
         for (int& ra_idx : pim_ranks_)
         {
@@ -95,17 +98,21 @@ void PIMKernel::addTransactionAll(bool is_write, int bg_idx, int bank_idx, int r
             unsigned local_col = col;
             for (int i = 0; i < num_loop; i++)
             {
+                // if (tag == "PART1") {
+                //     std::cout << "local_row is " << local_row << ", local_col is " << local_col << ", num_loop is " << num_loop << ",i is " << i << std::endl;
+                // }
+
                 uint64_t addr = pim_addr_mgr_->addrGenSafe(ch_idx, ra_idx, bg_idx, bank_idx,
                                                            local_row, local_col);
                 (tag != "") ? mem_->addTransaction(is_write, addr, tag, bst)
                             : mem_->addTransaction(is_write, addr, bst);
                 local_col++;
             }
+            
         }
-
     if (use_barrier)
         addBarrier();
-}
+    }
 
 void PIMKernel::addTransactionAll(bool is_write, int bg_idx, int bank_idx, int row, int col,
                                   BurstType* bst, bool use_barrier, int num_loop)
@@ -500,6 +507,7 @@ void PIMKernel::executeEltwise(int dim, pimBankType pb_type, KernelType ktype, i
                                int result_row, int input1_row)
 {
     int num_tile = dim / (num_banks_ * num_pim_chans_ * num_pim_ranks_ * num_grf_);
+    std::cout << "num_tile is " << num_tile << std::endl;
     int num_jump_to_be_taken = num_tile - 1;
     vector<PIMCmd> pim_cmds = PIMCmdGen::getPIMCmds(ktype, num_jump_to_be_taken, 0, 0);
 
@@ -507,6 +515,7 @@ void PIMKernel::executeEltwise(int dim, pimBankType pb_type, KernelType ktype, i
     //     std::cout << pim_cmds[i].toStr();
     // }
 
+    // setControl(&bst_hab_pim_, true, 0, false, false);
     setControl(&bst_hab_pim_, true, getToggleCond(pb_type), false, false);
     setControl(&bst_hab_, false, getToggleCond(pb_type), false, false);
 
@@ -629,33 +638,87 @@ void PIMKernel::adderTree(BurstType* result, int output_dim, int num_tile, int s
     return;
 }
 
+// void PIMKernel::computeAddOrMul(int num_tile, int input0_row, int result_row, int input1_row)
+// {
+//     for (int i = 0; i < num_tile; i++)
+//     {
+//         int c = num_grf_ * i;
+//         for (int b = 0; b < 2; b++)  // for even/odd banks, respectively
+//         {
+//             addTransactionAll(false, 0, b, input0_row, c, "BANK_TO_GRF_", &null_bst_, true,
+//                               num_grf_);
+//             addTransactionAll(false, 0, b, input1_row, c, "ADD", &null_bst_, true, num_grf_);
+//             addTransactionAll(true, 0, b, result_row, c, "GRF_TO_BANK", &null_bst_, true, num_grf_);
+//         }
+//     }
+// }
+
 
 void PIMKernel::executeFirstPartition(int dim0, int dim1, pimBankType pb_type, KernelType ktype, int input0_row,
-    int input1_row)
+    int input1_row) //dim : # of burst
 {
-    // int num_tile = dim / (num_banks_ * num_pim_chans_ * num_pim_ranks_ * num_grf_);
-    // int num_jump_to_be_taken = num_tile - 1;
-    // vector<PIMCmd> pim_cmds = PIMCmdGen::getPIMCmds(ktype, num_jump_to_be_taken, 0, 0);
 
-    // // for (int i = 0; i < pim_cmds.size(); i++) {
-    // //     std::cout << pim_cmds[i].toStr();
-    // // }
+    int max_inner_row = dim0/32/16;
+    int max_outer_row = dim1/32/16;
 
-    // setControl(&bst_hab_pim_, true, getToggleCond(pb_type), false, false);
-    // setControl(&bst_hab_, false, getToggleCond(pb_type), false, false);
+    // std::cout << "dim0, " << dim0 << std::endl;
 
-    // parkIn();
-    // changePIMMode(dramMode::SB, dramMode::HAB);
-    // programCrf(pim_cmds);
-    // changePIMMode(dramMode::HAB, dramMode::HAB_PIM);
+    int num_jump_to_be_taken = max_inner_row + max_outer_row - 1;
 
-    // if (ktype == KernelType::ADD || ktype == KernelType::MUL)
-    // computeAddOrMul(num_tile, input0_row, result_row, input1_row);
-    // else if (ktype == KernelType::RELU)
-    // computeRelu(num_tile, input0_row, result_row);
+    vector<PIMCmd> pim_cmds = PIMCmdGen::getPIMCmds(ktype, num_jump_to_be_taken, 0, 0);
 
-    // changePIMMode(dramMode::HAB_PIM, dramMode::HAB);
-    // changePIMMode(dramMode::HAB, dramMode::SB);
-    // parkOut();
+    std::cout << "222" << std::endl;
+
+    setControl(&bst_hab_pim_, true, getToggleCond(pb_type), false, false);
+    setControl(&bst_hab_, false, getToggleCond(pb_type), false, false);
+
+    std::cout << "333" << std::endl;
+
+    parkIn();
+    changePIMMode(dramMode::SB, dramMode::HAB);
+    programCrf(pim_cmds);
+    changePIMMode(dramMode::HAB, dramMode::HAB_PIM);
+
+    std::cout << "444" << std::endl;
+
+
+
+    for (unsigned int row=0; row < max_inner_row; row++) {
+        addTransactionAll(false, 0, 0, row, 0, "PART1", &null_bst_, true, 32);
+
+        for (unsigned int src_bnk = 0; src_bnk < 16; src_bnk++) {
+            for (unsigned int bg = 0; bg < 4; bg++) {
+                for (unsigned int bnk = 0; bnk < 4; bnk++) {
+                    addTransactionAll(false, 0, bnk%2, (row + 8192), 0, "STB1", &null_bst_, true, 32);
+                }
+            }
+        }
+
+    }
+
+    // for (unsigned int row=0; row < max_outer_row; row++) {
+    //     addTransactionAll(false, 0, 0, row, 0, "PART1", &null_bst_, true, 32);
+
+    //     for (unsigned int i=0; i<256; i++) {
+    //         addTransactionAll(true, 0, 0, (row+8192), 0, "STB1", &null_bst_, true, 32);
+    //     }
+
+    // }
+
+    changePIMMode(dramMode::HAB_PIM, dramMode::HAB);
+    changePIMMode(dramMode::HAB, dramMode::SB);
+    parkOut();
     return;
 }
+
+// void PIMKernel::preloadNoReplacement(NumpyBurstType* operand, unsigned starting_row,
+//     unsigned starting_col)
+// {
+// uint64_t init_addr = pim_addr_mgr_->addrGenSafe(0, 0, 0, 0, starting_row, starting_col);
+
+// for (int x = 0; x < operand->getTotalDim(); x++)
+// {
+// uint64_t addr = init_addr + x * transaction_size_;
+// mem_->addTransaction(true, addr, &operand->bData[x]);
+// }
+// }
